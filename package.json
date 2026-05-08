@@ -12,6 +12,7 @@
     "@react-router/express": "7.15.0",
     "@react-router/node": "7.15.0",
     "compression": "^1.8.1",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "isbot": "^5.1.36",
     "morgan": "^1.10.1",

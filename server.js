@@ -1,8 +1,10 @@
+import * as dotenv from 'dotenv';
 import compression from "compression";
 import express from "express";
 import morgan from "morgan";
 
 // Short-circuit the type-checking of the built output.
+dotenv.config();
 const BUILD_PATH = "./build/server/index.js";
 const DEVELOPMENT = process.env.NODE_ENV === "development";
 const PORT = Number.parseInt(process.env.PORT || "3000");
