@@ -17,6 +17,7 @@
     "isbot": "^5.1.36",
     "morgan": "^1.10.1",
     "mysql2": "^3.22.3",
+    "nodemailer": "^8.0.7",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router": "7.15.0"
@@ -30,6 +31,7 @@
     "@types/express-serve-static-core": "^5.1.1",
     "@types/morgan": "^1.9.10",
     "@types/node": "^22",
+    "@types/nodemailer":"^8.0.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "axios": "^1.16.0",
