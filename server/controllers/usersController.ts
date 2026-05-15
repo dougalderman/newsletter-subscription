@@ -1,8 +1,6 @@
-// import { QuizAnswerModel } from  '../../../models/quizzes/quiz-answer.model';
-
 class User /* extends UsersModel */ {}
 
-  /*constructor(
+  constructor(
     reqQuizId: number,
     reqQuestionId: number,
     reqResultId: number,
