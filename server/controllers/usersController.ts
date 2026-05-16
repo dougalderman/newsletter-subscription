@@ -1,52 +1,10 @@
-class User /* extends UsersModel */ {}
-
-  constructor(
-    reqQuizId: number,
-    reqQuestionId: number,
-    reqResultId: number,
-    reqAnsweredCorrectly: boolean,
-    reqTimeToAnswer: string,
-    reqTextAnswer: string,
-    reqBooleanAnswer: boolean,
-    reqDateAnswer: Date,
-    reqDateStartAnswer: Date,
-    reqDateEndAnswer: Date,
-    reqLocationAnswers: [object],
-    reqIntegerAnswer: number,
-    reqIntegerStartAnswer: number,
-    reqIntegerEndAnswer: number,
-    reqRealAnswer: number,
-    reqRealStartAnswer: number,
-    reqRealEndAnswer: number
-  ) {
-    super();
-
-    this.quizId = reqQuizId;
-    this.questionId = reqQuestionId;
-    this.resultId = reqResultId;
-    this.answeredCorrectly = reqAnsweredCorrectly;
-    this.timeToAnswer = reqTimeToAnswer;
-    this.textAnswer = reqTextAnswer;
-    this.booleanAnswer = reqBooleanAnswer;
-    this.dateAnswer = reqDateAnswer;
-    this.dateStartAnswer = reqDateStartAnswer;
-    this.dateEndAnswer = reqDateEndAnswer;
-    this.locationAnswers = reqLocationAnswers;
-    this.integerAnswer = reqIntegerAnswer;
-    this.integerStartAnswer = reqIntegerStartAnswer;
-    this.integerEndAnswer = reqIntegerEndAnswer;
-    this.realAnswer =  reqRealAnswer;
-    this.realStartAnswer =  reqRealStartAnswer;
-    this.realEndAnswer =  reqRealEndAnswer;
-  }
-}
 
 export class UsersController {
 
   static create(pgSqlPool: Pool): any {
     return (req, res) => {
       if (req.body) {
-        const answer = new Answer(
+        const answer = new User(
           req.body.quizId,
           req.body.questionId,
           req.body.resultId,
@@ -66,7 +24,7 @@ export class UsersController {
           req.body.realEndAnswer
         );
         const query = {
-          text: 'INSERT INTO QuizAnswers(quiz_id, question_id, result_id, answered_correctly, time_to_answer, ' +
+          text: 'INSERT INTO Users(quiz_id, question_id, result_id, answered_correctly, time_to_answer, ' +
             'text_answer, boolean_answer, date_answer, date_start_answer, date_end_answer, location_answers, ' +
             'integer_answer, integer_start_answer, integer_end_answer, real_answer, real_start_answer, ' +
             'real_end_answer) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)',

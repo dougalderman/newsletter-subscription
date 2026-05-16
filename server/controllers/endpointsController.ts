@@ -17,7 +17,7 @@ export class EndpointsController {
   app.get('/api/analytics', AuthenticationController.authenticateToken, UsersController.readAll(mySqlPool)); // Gets analytics data for admin dashboard.
   app.post('/api/signup', UsersController.create(mySqlPool)); // Signs up new subscriber.
   app.post('/api/verify-email', UsersController.verifyEmail(mySqlPool)); // Confirms verification code and writes user record to database.
-  app.post('/api/login', UsersController.login(mySqlPool)); // Logs in user.
+  app.post('/api/login', UsersController.login(mySqlPool), AuthenticationController.signToken); // Logs in user.
 
   // Routes
 
