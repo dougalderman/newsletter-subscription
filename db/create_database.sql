@@ -19,7 +19,7 @@ CREATE TABLE Users (
   id serial PRIMARY KEY,
   first_name text NOT NULL,
   last_name text,
-  email_id int REFERENCES EmailVerifications,
+  email text,
   password_hash text NOT NULL,
   phone_number text,
   street_address text,

@@ -1,6 +1,6 @@
-import "react-router";
-import { createRequestHandler } from "@react-router/express";
-import express from "express";
+import 'react-router';
+import { createRequestHandler } from '@react-router/express';
+import express from 'express';
 import mysql from 'mysql2/promise';
 import type { Pool } from 'mysql2/promise';
 import type { Transporter } from 'nodemailer';
@@ -9,7 +9,7 @@ import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { EndpointsController } from './controllers/endpointsController';
 import { Email } from './controllers/emailController';
 
-declare module "react-router" {
+declare module 'react-router' {
   interface AppLoadContext {
     VALUE_FROM_EXPRESS: string;
   }
@@ -36,10 +36,10 @@ new EndpointsController(app, mySqlPool, transporter);
 
 app.use(
   createRequestHandler({
-    build: () => import("virtual:react-router/server-build"),
+    build: () => import('virtual:react-router/server-build'),
     getLoadContext() {
       return {
-        VALUE_FROM_EXPRESS: "Hello from Express",
+        VALUE_FROM_EXPRESS: 'Hello from Express',
       };
     },
   }),

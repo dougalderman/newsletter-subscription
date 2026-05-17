@@ -14,10 +14,10 @@ export class EndpointsController {
   // Endpoints
 
   // Users
-  app.get('/api/analytics', AuthenticationController.authenticateToken, UsersController.readAll(mySqlPool)); // Gets analytics data for admin dashboard.
-  app.post('/api/signup', UsersController.create(mySqlPool)); // Signs up new subscriber.
-  app.post('/api/verify-email', UsersController.verifyEmail(mySqlPool)); // Confirms verification code and writes user record to database.
-  app.post('/api/login', UsersController.login(mySqlPool), AuthenticationController.signToken); // Logs in user.
+  app.post('/api/signup', UsersController.checkEmailUniqueness(mySqlPool)) // Checks that email is unique.
+  app.post('/api/verify-email', UsersController.verifyEmail(mySqlPool), UsersController.create(mySqlPool)); // Confirms verification code and writes user record to database.
+  // app.get('/api/analytics', AuthenticationController.authenticateToken, UsersController.readAll(mySqlPool)); // Gets analytics data for admin dashboard.
+  // app.post('/api/login', UsersController.login(mySqlPool), AuthenticationController.signToken); // Logs in user.
 
   // Routes
 
