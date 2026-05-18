@@ -1,86 +1,30 @@
-# Welcome to React Router!
+# React Newsletter Subscription
 
-A modern, production-ready template for building full-stack React applications using React Router.
+A newsletter subscription form with different subscription levels and email verification, and an analytics page.
 
-## Features
+## Requirements
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+The form will have fields for first name, last name, email, password, password again, phone number, street address, county, state, zip code, and a selection of different subscription levels. Required fields are email, password, county, and subscription level. Verification will be done to make sure email is not already in database. Here are the levels:
 
-## Getting Started
+1)	Free
+2)	$5/month
+3)	$10/month
+4)	$15/month
+5)	$20/month
+6)	$25/month
+7)	$50 month (max)
 
-### Installation
+Hitting the submit button on this page will lead to an email verification involving sending a verification code. After email is verified, the screen will display a message saying that the user has been successfully added as a subscriber (ignoring payments). The user record will be added to the database.
 
-Install the dependencies:
+There will be a separate analytics page. It will show the following:
+ 
+1)	Line charts showing number and amount of subscriptions vs. time.
+2)	A histogram showing number of subscriptions at each level.
+3)	A bubble map showing visually subscriptions per U.S. county.
 
-```bash
-npm install
-```
 
-### Development
+This will be a React/Typerscript app with Axios/TanStack Query for http calls, Zod combined with React Hook form and Shadcn/UI for the signup form, React Router/Vite for package builder, Node/Express for sever, Nodemailer for the email verification, bcrypt for encrypting passwords and OTP codes, JWT for handling login authentication, and a MySQL database to store the form information to and perform queries for the analytics. The analytics will use Observable Plot that will interpret the data in CSV format from database queries. There will be 4 routes: signup, email-verification, admin, and login. The admin route will be restricted to authenticated users. If an unauthenticated user tries to access admin, he’ll be directed to the login route.
 
-Start the development server with HMR:
+Technologies used:
+React, TypeScript, Lodash, Axios, TanStack Query, Observable Plot, Zod/React Hook Form, React Router/Vite, Shadcn/UI, Cursor, Copilot, Google AI, Node.js, Express, MySQL
 
-```bash
-npm run dev
-```
-
-Your application will be available at `http://localhost:5173`.
-
-## Building for Production
-
-Create a production build:
-
-```bash
-npm run build
-```
-
-## Deployment
-
-### Docker Deployment
-
-To build and run using Docker:
-
-```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
-```
-
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── server.js
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
