@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS EmailVerifications;
 CREATE TABLE EmailVerifications (
   id serial PRIMARY KEY,
   email text NOT NULL,
-  verification_code text,
+  verification_code_hash text NOT NULL,
   expires_at timestamp NOT NULL
 ); 
 

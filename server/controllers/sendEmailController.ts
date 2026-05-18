@@ -2,7 +2,7 @@ import { createTransport } from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 import * as SMTPTransport from 'nodemailer/lib/smtp-transport';
 
-export class Email {
+export class SendEmail {
   smtpHost = process.env.SMTP_HOST;
   smtpPort = Number(process.env.SMTP_PORT);
   smtpSecure = Boolean(process.env.SMTP_SECURE);
@@ -25,7 +25,7 @@ export class Email {
   constructor() {};
 }
 
-export class EmailController {
+export class SendEmailController {
 
   static async sendEmail(
     transporter: Transporter<SMTPTransport.SentMessageInfo>,

@@ -7,7 +7,7 @@ import type { Transporter } from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 import { EndpointsController } from './controllers/endpointsController';
-import { Email } from './controllers/emailController';
+import { SendEmail } from './controllers/sendEmailController';
 
 declare module 'react-router' {
   interface AppLoadContext {
@@ -29,7 +29,7 @@ const mySqlPool = await mysql.createPool({
 const connection = await mySqlPool.getConnection();
 
 // Create new Nodemailer transporter object
-const transporter: Transporter<SMTPTransport.SentMessageInfo> = new Email().transporter;
+const transporter: Transporter<SMTPTransport.SentMessageInfo> = new SendEmail().transporter;
 
 // Endpoints
 new EndpointsController(app, mySqlPool, transporter);

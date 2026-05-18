@@ -16,7 +16,7 @@ export class AuthenticationController {
 
     if (!token) return res.sendStatu(401); // Unauthorized
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
+    jwt.verify(token, process.env.JWT_TOKEN_SECRET as string, (err: any, user: any) => {
       if (err) return res.sendStatus(403); // Forbidden
 
       // Attach user info to the request for the next handler
