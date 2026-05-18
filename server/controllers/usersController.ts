@@ -121,14 +121,71 @@ export class UsersController {
 }
 
 static checkEmailUniqueness(mySqlPool: Pool): any {
-  return (req: any, res: any) => {
+  return async (req: any, res: any) => {
     if (req.body && req.body.email) {
+      const sql = 'SELECT * FROM Users WHERE email = ?';
+      const values = [req.body.email];
+
+      try {
+        const [results, fields] = await mySqlPool.execute(sql, values);
+
+        console.log('results: ', results);
+        console.log('fields: ', fields);
+
+        if (Array.isArray(results) && results.length === 0) { // if email is unique
+          return res.send(results);
+        }
+        else {
+          return res.status(409).send('Email already exists');
+        }  
+      }
+      catch(err) {
+        return res.status(500).send(err);
+      }
+    }
+  }
+}
+
+/* static verifyEmail(mySqlPool: Pool): any {
+  return async (req: any, res: any) => {
+    if (req.body && req.body.email) {
+    }
+  }
+}    
+
+
+          user.lastName,
+          user.email,
+          user.passwordHash,
+          user.phoneNumber,
+          user.streetAddress, 
+          user.county,
+          user.state,
+          user.zipCode,
+          user.subscriber,
+          user.subscriptionLevel,
+          user.verified,
+          user.adminAuthorized
+        ]
+
+        try {
+          const [results, fields] = await mySqlPool.execute(sql, values);
+
+          console.log('results: ', results);
+          console.log('fields: ', fields);
+
+          return res.send(results);
+        }  
+        catch(err) {
+          return res.status(500).send(err);
+        }    
+
     }
   }
 }
 
 static verifyEmail(mySqlPool: Pool): any {
-  return (req: any, res: any) => {
+  return async (req: any, res: any) => {
     if (req.body && req.body.email) {
     }
   }

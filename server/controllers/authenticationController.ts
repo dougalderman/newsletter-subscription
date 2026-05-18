@@ -6,7 +6,7 @@ export class AuthenticationController {
     const { body } = req;
     const { username, password } = body;
 
-    if (username === )
+    // if (username === )
   }  
 
   authenticateToken: any = (req: any, res: any, next: any) => {
