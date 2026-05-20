@@ -3,9 +3,11 @@ import type { Pool } from 'mysql2/promise';
 import type { Transporter } from 'nodemailer';
 import { UsersController } from './usersController';
 import { EmailVerificationsController } from './emailVerificationsController';
+import { SendEmailController } from './sendEmailController';
 // import { AuthenticationController } from './authenticationController';
 
 export class EndpointsController {
+
   constructor(app: any, mySqlPool: Pool, transporter: Transporter<any>) {
     this.runEndpoints(app, mySqlPool, transporter)
   }
@@ -14,8 +16,9 @@ export class EndpointsController {
 
   // Endpoints
 
-  // Users
-  app.post('/api/signup', UsersController.checkEmailUniqueness(mySqlPool), EmailVerificationsController.createEmailVerification(mySqlPool)); // Checks that email is unique. If so, it creates an email verfication table record.
+  // Checks that email is unique. If so, it creates an email verfication table record, and sends an email to the user with the verification code.
+  app.post('/api/signup', UsersController.checkEmailUniqueness(mySqlPool), EmailVerificationsController.createEmailVerification(mySqlPool), SendEmailController.sendEmail(transporter)); 
+  
   app.post('/api/verify-email', EmailVerificationsController.verifyEmail(mySqlPool), UsersController.createUser(mySqlPool)); // Confirms verification code and writes user record to database.
   // app.get('/api/analytics', AuthenticationController.authenticateToken, UsersController.readAll(mySqlPool)); // Gets analytics data for admin dashboard.
   // app.post('/api/login', UsersController.login(mySqlPool), AuthenticationController.signToken); // Logs in user.

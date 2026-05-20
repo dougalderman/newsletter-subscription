@@ -20,31 +20,36 @@ export class SendEmail {
     // logger: true
   }
 
-  transporter: Transporter<SMTPTransport.SentMessageInfo> = createTransport(this.options);
+  transporter: Transporter<SMTPTransport.SentMessageInfo>;
 
-  constructor() {};
+  constructor() {
+    this.transporter = createTransport(this.options);
+  };
 }
 
 export class SendEmailController {
 
-  static async sendEmail(
-    transporter: Transporter<SMTPTransport.SentMessageInfo>,
-    email: string,
-    subject: string,
-    message: string
-  ): Promise<any> {
-  
-    await transporter.sendMail({
-      from: process.env.SMTP_SEND_FROM,
-      to: email,
-      subject: subject,
-      text: message,
-    })
-    .then((results: any) => {
-      // console.log('Message sent: %s', results.messageId);
-    })
-    .catch((e: any) => {
-      console.error(e)
-    })
+  static sendEmail(transporter: Transporter<SMTPTransport.SentMessageInfo>): any {
+
+    return async (req: any, res: any) => {
+
+      if (req.body && req.body.email && req.otp) {
+
+        await transporter.sendMail({
+          from: process.env.SMTP_SEND_FROM,
+          to: req.body.email,
+          subject: 'Verify Email using code',
+          text: `Please enter the following code into the verification field: ${req.otp}`,
+        })
+        .then((results: any) => {
+          console.log('Message sent: %s', results.messageId);
+          return res.send(results);
+        })
+        .catch((err: any) => {
+          console.error(err);
+          return res.status(500).send(err);
+        })
+      }
+    }  
   }
-}
+}  

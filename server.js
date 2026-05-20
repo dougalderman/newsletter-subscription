@@ -11,7 +11,20 @@ const PORT = Number.parseInt(process.env.PORT || '3000');
 
 const app = express();
 
-app.use(compression());
+app.use(compression({
+  threshold: 1024, // Only compress if response is larger than 1kb
+  filter: (req, res) => {
+    // Disable compression if the client explicitly requests it
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    // Fallback to default compression filtering
+    return compression.filter(req, res);
+  }
+}));
+
+app.use(express.json());
+
 app.disable('x-powered-by');
 
 if (DEVELOPMENT) {

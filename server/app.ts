@@ -18,15 +18,15 @@ declare module 'react-router' {
 export const app = express();
 
 // Create the connection to database
-const mySqlPool = await mysql.createPool({
+const mySqlPool: Pool = mysql.createPool({
   host: process.env.MYSQLHOST,
   port: Number(process.env.MYSQLPORT),
   database: process.env.MYSQLDATABASE,
   user: process.env.MYSQLUSER,
-  password: process.env.PASSWORD
+  password: process.env.MYSQLPASSWORD
 });
 
-const connection = await mySqlPool.getConnection();
+await mySqlPool.getConnection();
 
 // Create new Nodemailer transporter object
 const transporter: Transporter<SMTPTransport.SentMessageInfo> = new SendEmail().transporter;
@@ -44,6 +44,3 @@ app.use(
     },
   }),
 );
-
-connection.release();
-await mySqlPool.end();

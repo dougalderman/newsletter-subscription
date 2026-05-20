@@ -5,9 +5,5 @@ export default [
   route('/signup', 'routes/signup.tsx'),
   route('/email-verification', 'routes/email-verification.tsx'),
   route('/admin', 'routes/admin.tsx'),
-  route('/login', 'routes/login.tsx'),
-  route( // Handle console error.
-    '/.well-known/appspecific/com.chrome.devtools.json',
-    'routes/debug-null.tsx',
-  ),
+  route('/login', 'routes/login.tsx')
 ] satisfies RouteConfig;

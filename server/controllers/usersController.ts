@@ -1,18 +1,22 @@
-import type { UsersModel } from './../../models/users.model';
+import type { UserType } from '../../schemas/user.schema';
+import { UserSchema } from '../../schemas/user.schema';
 import type { Pool } from 'mysql2/promise';
 import bcrypt from 'bcrypt';
+import * as z from 'zod';
 
-class User implements UsersModel {
+class User implements UserType {
   firstName: string;
   lastName: string;
   email: string;
   passwordHash: string;
   phoneNumber: string;
-  streetAddress: string;
+  streetAddress1: string;
+  streetAddress2: string;
+  city: string;
   county: string;
   state: string;
   zipCode: string;
-  subscriber: string;
+  subscriber: boolean;
   subscriptionLevel: number;
   verified: boolean;
   adminAuthorized: boolean;
@@ -23,11 +27,13 @@ class User implements UsersModel {
     email: string,
     passwordHash: string,
     phoneNumber: string,
-    streetAddress: string,
+    streetAddress1: string,
+    streetAddress2: string,
+    city: string,
     county: string,
     state: string,
     zipCode: string,
-    subscriber: string,
+    subscriber: boolean,
     subscriptionLevel: number,
     verified: boolean,
     adminAuthorized: boolean
@@ -37,7 +43,9 @@ class User implements UsersModel {
     this.email = email;
     this.passwordHash = passwordHash;
     this.phoneNumber = phoneNumber;
-    this.streetAddress = streetAddress;
+    this.streetAddress1 = streetAddress1;
+    this.streetAddress2 = streetAddress2;
+    this.city = city;
     this.county = county;
     this.state = state;
     this.zipCode = zipCode;
@@ -75,7 +83,9 @@ export class UsersController {
         req.body.email,
         passwordHash,
         req.body.phoneNumber,
-        req.body.streetAddress,
+        req.body.streetAddress1,
+        req.body.streetAddress2,
+        req.body.city,
         req.body.county,
         req.body.state,
         req.body.zipCode,
@@ -84,45 +94,62 @@ export class UsersController {
         true,
         false
       );
+
+      try {
+
+        UserSchema.parse(user);
         
-      const sql = 'INSERT INTO Users (first_name, last_name, email, password_hash, phone_number, ' +
-          'street_address, county, state, zip_code, subscriber, subscription_level, verified, ' +
-          'created_at, admin_authorized VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)';
-      
-      const values = [
-          user.firstName,
-          user.lastName,
-          user.email,
-          user.passwordHash,
-          user.phoneNumber,
-          user.streetAddress, 
-          user.county,
-          user.state,
-          user.zipCode,
-          user.subscriber,
-          user.subscriptionLevel,
-          user.verified,
-          user.adminAuthorized
-        ]
+        const sql = 'INSERT INTO Users (first_name, last_name, email, password_hash, phone_number, ' +
+            'street_address, county, state, zip_code, subscriber, subscription_level, verified, ' +
+            'created_at, admin_authorized) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)';
+        
+        const values = [
+            user.firstName,
+            user.lastName,
+            user.email,
+            user.passwordHash,
+            user.phoneNumber,
+            user.streetAddress1,
+            user.streetAddress2, 
+            user.county,
+            user.state,
+            user.zipCode,
+            user.subscriber,
+            user.subscriptionLevel,
+            user.verified,
+            user.adminAuthorized
+          ]
 
-        try {
-          const [results, fields] = await mySqlPool.execute(sql, values);
+          try {
+            const [results, fields] = await mySqlPool.execute(sql, values);
 
-          console.log('results: ', results);
-          console.log('fields: ', fields);
+            console.log('results: ', results);
+            console.log('fields: ', fields);
 
-          return res.send(results);
-        }  
-        catch(err) {
-          return res.status(500).send(err);
-        }    
-           
-    }
+            return res.send(results);
+          }  
+          catch(err) {
+            return res.status(500).send(err);
+          }
+      }
+      catch(err) {
+        if (err instanceof z.ZodError) {
+          return res.status(400).send(err.issues);
+        }
+        else {
+          return res.status(500).send('Unknown error');
+        }          
+      }
+    }  
   }
 
   static checkEmailUniqueness(mySqlPool: Pool): any {
-    return async (req: any, res: any) => {
+    
+    return async (req: any, res: any, next: any) => {
+      console.log('Request body check email uniqueness: ', req.body);
       if (req.body && req.body.email) {
+        console.log('req.body && req.body.email');
+
         const sql = 'SELECT * FROM Users WHERE email = ?';
         const values = [req.body.email];
 
@@ -133,7 +160,7 @@ export class UsersController {
           console.log('fields: ', fields);
 
           if (Array.isArray(results) && results.length === 0) { // if email is unique
-            return res.send(results);
+            next();
           }
           else {
             return res.status(409).send('Email already exists');
