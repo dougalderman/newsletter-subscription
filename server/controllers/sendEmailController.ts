@@ -35,6 +35,8 @@ export class SendEmailController {
 
       if (req.body && req.body.email && req.otp) {
 
+        console.log('Request body send email: ', req.body);
+
         await transporter.sendMail({
           from: process.env.SMTP_SEND_FROM,
           to: req.body.email,

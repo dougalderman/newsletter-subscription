@@ -69,7 +69,7 @@ export class UsersController {
         if (req.body.password) {
           bcrypt.hash(req.body.password, Number(process.env.SALT_ROUNDS), async function(err, hash) {
             if (err) {
-              console.log('Error hashing password: ', err);
+              console.error('Error hashing password: ', err);
               return res.status(500).send('Error hashing password');
             }
             else {
@@ -97,28 +97,29 @@ export class UsersController {
               try {
 
                 console.log('Before parsing user: ', user);
-                UserSchema.parse(user);
-                console.log('After parsing user');
+                const parsedUser = UserSchema.parse(user);
+                console.log('After parsing user', parsedUser);
                 
                 const sql = 'INSERT INTO Users (first_name, last_name, email, password_hash, phone_number, ' +
-                    'street_address, county, state, zip_code, subscriber, subscription_level, verified, ' +
-                    'created_at, admin_authorized) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)';
+                    'street_address1, street_address2, city, county, state, zip_code, subscriber, subscription_level, verified, ' +
+                    'created_at, admin_authorized) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)';
                 
-                const values = [
-                    user.firstName,
-                    user.lastName,
-                    user.email,
-                    user.passwordHash,
-                    user.phoneNumber,
-                    user.streetAddress1,
-                    user.streetAddress2, 
-                    user.county,
-                    user.state,
-                    user.zipCode,
-                    user.subscriber,
-                    user.subscriptionLevel,
-                    user.verified,
-                    user.adminAuthorized
+                const values: any[] = [
+                    parsedUser.firstName,
+                    parsedUser.lastName,
+                    parsedUser.email,
+                    parsedUser.passwordHash,
+                    parsedUser.phoneNumber,
+                    parsedUser.streetAddress1,
+                    parsedUser.streetAddress2, 
+                    parsedUser.city,
+                    parsedUser.county,
+                    parsedUser.state,
+                    parsedUser.zipCode,
+                    parsedUser.subscriber,
+                    parsedUser.subscriptionLevel,
+                    parsedUser.verified,
+                    parsedUser.adminAuthorized
                   ]
 
                   try {
@@ -130,19 +131,29 @@ export class UsersController {
                     next();
                   }  
                   catch(err) {
+                    console.error('error executing SQL: ', err);
                     return res.status(500).send(err);
                   }
               }
               catch(err) {
                 if (err instanceof z.ZodError) {
+                  console.error('Validation error: ', err.issues);  
                   return res.status(400).send(err.issues);
                 }
                 else {
+                  console.error('Unknown error: ', err);
                   return res.status(500).send('Unknown error');
                 }          
               }
             }  
           });  
+        }
+        else {
+          console.error('Password is required');
+          return res.status(400).json({
+            error: 'password is required',
+            receivedKeys: Object.keys(req.body ?? {}),
+          });
         }    
       }
     }  
@@ -152,6 +163,7 @@ export class UsersController {
     
     return async (req: any, res: any, next: any) => {
       console.log('Request body check email uniqueness: ', req.body);
+      
       if (req.body && req.body.email) {
         console.log('req.body && req.body.email');
 
@@ -172,8 +184,16 @@ export class UsersController {
           }  
         }
         catch(err) {
+          console.error('error executing SQL: ', err);
           return res.status(500).send(err);
         }
+      }
+      else {
+        console.error('email is required');
+        return res.status(400).json({
+          error: 'email is required',
+          receivedKeys: Object.keys(req.body ?? {}),
+        });
       }
     }
   }
@@ -204,8 +224,16 @@ export class UsersController {
           }  
         }
         catch(err) {
+          console.error('error executing SQL: ', err);
           return res.status(500).send(err);
         }
+      }
+      else {
+        console.error('email is required');
+        return res.status(400).json({
+          error: 'email is required',
+          receivedKeys: Object.keys(req.body ?? {}),
+        });
       }
     }
   }
