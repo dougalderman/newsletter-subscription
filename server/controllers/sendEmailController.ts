@@ -41,7 +41,8 @@ export class SendEmailController {
           from: process.env.SMTP_SEND_FROM,
           to: req.body.email,
           subject: 'Verify Email using code',
-          text: `Please enter the following code into the verification field: ${req.otp}`,
+          text:
+          `Please enter the following code into the verification field: ${req.otp}.\n\nThis code will expire in 10 minutes.`,
         })
         .then((results: any) => {
           console.log('Message sent: %s', results.messageId);

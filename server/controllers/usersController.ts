@@ -18,9 +18,7 @@ class User implements UserType {
   zipCode: string;
   subscriber: boolean;
   subscriptionLevel: number;
-  verified: boolean;
-  adminAuthorized: boolean;
-
+  
   constructor(
     firstName: string,
     lastName: string,
@@ -35,8 +33,6 @@ class User implements UserType {
     zipCode: string,
     subscriber: boolean,
     subscriptionLevel: number,
-    verified: boolean,
-    adminAuthorized: boolean
   ) {
     this.firstName = firstName;
     this.lastName = lastName;
@@ -51,8 +47,6 @@ class User implements UserType {
     this.zipCode = zipCode;
     this.subscriber = subscriber;
     this.subscriptionLevel = subscriptionLevel;
-    this.verified = verified;
-    this.adminAuthorized = adminAuthorized; 
   }
 }
 
@@ -90,8 +84,6 @@ export class UsersController {
                 req.body.zipCode,
                 req.body.subscriber,
                 req.body.subscriptionLevel,
-                true,
-                false
               );
 
               try {
@@ -102,7 +94,7 @@ export class UsersController {
                 
                 const sql = 'INSERT INTO Users (first_name, last_name, email, password_hash, phone_number, ' +
                     'street_address1, street_address2, city, county, state, zip_code, subscriber, subscription_level, verified, ' +
-                    'created_at, admin_authorized) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)';
+                    'created_at, admin_authorized) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, FALSE, NOW(), FALSE)';
                 
                 const values: any[] = [
                     parsedUser.firstName,
@@ -118,8 +110,6 @@ export class UsersController {
                     parsedUser.zipCode,
                     parsedUser.subscriber,
                     parsedUser.subscriptionLevel,
-                    parsedUser.verified,
-                    parsedUser.adminAuthorized
                   ]
 
                   try {

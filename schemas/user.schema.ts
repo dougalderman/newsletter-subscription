@@ -23,8 +23,6 @@ export const UserSchema = z.preprocess(
     zipCode: z.string(),
     subscriber: z.boolean(),
     subscriptionLevel: z.number(),
-    verified: z.boolean(),
-    adminAuthorized: z.boolean()
   })
 );
 
