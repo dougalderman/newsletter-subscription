@@ -4,7 +4,7 @@ A newsletter subscription form with different subscription levels and email veri
 
 ## Requirements
 
-The form will have fields for first name, last name, email, password, password again, phone number, street address, county, state, zip code, and a selection of different subscription levels. Required fields are email, password, county, and subscription level. Verification will be done to make sure email is not already in database. Here are the levels:
+The form will have fields for first name, last name, email, password, password again, phone number, street address1, street address2, county, state, zip code, and a selection of different subscription levels. Here are the levels:
 
 1)	Free
 2)	$5/month
@@ -14,7 +14,7 @@ The form will have fields for first name, last name, email, password, password a
 6)	$25/month
 7)	$50 month (max)
 
-Hitting the submit button on this page will lead to an email verification involving sending a verification code. After email is verified, the screen will display a message saying that the user has been successfully added as a subscriber (ignoring payments). The user record will be added to the database.
+Phone number and street address2 aren’t required. Hitting the submit button on this page will trigger the server to make sure the email is not already in database. If the email is unique, the user record will be added to the database with the verified field set to false. There will be an email verification involving sending a verification code. After email is verified, the screen will display a message saying that the user has been successfully added as a subscriber (ignoring payments). The verified field will be set to true.
 
 There will be a separate analytics page. It will show the following:
  

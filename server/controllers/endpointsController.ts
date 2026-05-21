@@ -16,10 +16,12 @@ export class EndpointsController {
 
   // Endpoints
 
-  // Checks that email is unique. If so, it creates an email verfication table record, and sends an email to the user with the verification code.
-  app.post('/api/signup', UsersController.checkEmailUniqueness(mySqlPool), EmailVerificationsController.createEmailVerification(mySqlPool), SendEmailController.sendEmail(transporter)); 
+  // Checks that email is unique. If so, create a user record and an email verfication table record, and send an email to the user with the verification code.
+  app.post('/api/signup', UsersController.checkEmailUniqueness(mySqlPool), UsersController.createUser(mySqlPool), 
+    EmailVerificationsController.createEmailVerification(mySqlPool), SendEmailController.sendEmail(transporter)); 
+  // Confirms verification code and updates user record to indicate verified.
+  app.post('/api/verify-email', EmailVerificationsController.verifyEmail(mySqlPool), UsersController.setUserVerified(mySqlPool));
   
-  app.post('/api/verify-email', EmailVerificationsController.verifyEmail(mySqlPool), UsersController.createUser(mySqlPool)); // Confirms verification code and writes user record to database.
   // app.get('/api/analytics', AuthenticationController.authenticateToken, UsersController.readAll(mySqlPool)); // Gets analytics data for admin dashboard.
   // app.post('/api/login', UsersController.login(mySqlPool), AuthenticationController.signToken); // Logs in user.
 

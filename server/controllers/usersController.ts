@@ -62,83 +62,88 @@ export class UsersController {
 
     let passwordHash: string = '';
 
-    return async (req: any, res: any) => {
+    return (req: any, res: any, next: any) => {
+      console.log('Request body create user: ', req.body);
+
       if (req.body) {
         if (req.body.password) {
-          bcrypt.hash(req.body.password, Number(process.env.SALT_ROUNDS), function(err, hash) {
+          bcrypt.hash(req.body.password, Number(process.env.SALT_ROUNDS), async function(err, hash) {
             if (err) {
               console.log('Error hashing password: ', err);
               return res.status(500).send('Error hashing password');
             }
             else {
               passwordHash = hash;
+              console.log('Password hash: ', passwordHash);
+
+              const user = new User(
+                req.body.firstName,
+                req.body.lastName,
+                req.body.email,
+                passwordHash,
+                req.body.phoneNumber,
+                req.body.streetAddress1,
+                req.body.streetAddress2,
+                req.body.city,
+                req.body.county,
+                req.body.state,
+                req.body.zipCode,
+                req.body.subscriber,
+                req.body.subscriptionLevel,
+                true,
+                false
+              );
+
+              try {
+
+                console.log('Before parsing user: ', user);
+                UserSchema.parse(user);
+                console.log('After parsing user');
+                
+                const sql = 'INSERT INTO Users (first_name, last_name, email, password_hash, phone_number, ' +
+                    'street_address, county, state, zip_code, subscriber, subscription_level, verified, ' +
+                    'created_at, admin_authorized) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)';
+                
+                const values = [
+                    user.firstName,
+                    user.lastName,
+                    user.email,
+                    user.passwordHash,
+                    user.phoneNumber,
+                    user.streetAddress1,
+                    user.streetAddress2, 
+                    user.county,
+                    user.state,
+                    user.zipCode,
+                    user.subscriber,
+                    user.subscriptionLevel,
+                    user.verified,
+                    user.adminAuthorized
+                  ]
+
+                  try {
+                    const [results, fields] = await mySqlPool.execute(sql, values);
+
+                    console.log('results: ', results);
+                    console.log('fields: ', fields);
+
+                    next();
+                  }  
+                  catch(err) {
+                    return res.status(500).send(err);
+                  }
+              }
+              catch(err) {
+                if (err instanceof z.ZodError) {
+                  return res.status(400).send(err.issues);
+                }
+                else {
+                  return res.status(500).send('Unknown error');
+                }          
+              }
             }  
-          });    
-        }
-      }  
-
-      const user = new User(
-        req.body.firstName,
-        req.body.lastName,
-        req.body.email,
-        passwordHash,
-        req.body.phoneNumber,
-        req.body.streetAddress1,
-        req.body.streetAddress2,
-        req.body.city,
-        req.body.county,
-        req.body.state,
-        req.body.zipCode,
-        req.body.subscriber,
-        req.body.subscriptionLevel,
-        true,
-        false
-      );
-
-      try {
-
-        UserSchema.parse(user);
-        
-        const sql = 'INSERT INTO Users (first_name, last_name, email, password_hash, phone_number, ' +
-            'street_address, county, state, zip_code, subscriber, subscription_level, verified, ' +
-            'created_at, admin_authorized) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)';
-        
-        const values = [
-            user.firstName,
-            user.lastName,
-            user.email,
-            user.passwordHash,
-            user.phoneNumber,
-            user.streetAddress1,
-            user.streetAddress2, 
-            user.county,
-            user.state,
-            user.zipCode,
-            user.subscriber,
-            user.subscriptionLevel,
-            user.verified,
-            user.adminAuthorized
-          ]
-
-          try {
-            const [results, fields] = await mySqlPool.execute(sql, values);
-
-            console.log('results: ', results);
-            console.log('fields: ', fields);
-
-            return res.send(results);
-          }  
-          catch(err) {
-            return res.status(500).send(err);
-          }
-      }
-      catch(err) {
-        if (err instanceof z.ZodError) {
-          return res.status(400).send(err.issues);
-        }
-        else {
-          return res.status(500).send('Unknown error');
-        }          
+          });  
+        }    
       }
     }  
   }
@@ -164,6 +169,38 @@ export class UsersController {
           }
           else {
             return res.status(409).send('Email already exists');
+          }  
+        }
+        catch(err) {
+          return res.status(500).send(err);
+        }
+      }
+    }
+  }
+
+  static setUserVerified(mySqlPool: Pool): any {
+      
+    return async (req: any, res: any, next: any) => {
+      console.log('Request body setUserVerified: ', req.body);
+      if (req.body && req.body.email) {
+        console.log('req.body && req.body.email');
+
+        const sql = 'UPDATE Users SET verified=true WHERE email = ?';
+        const values = [req.body.email];
+
+        try {
+          const [results, fields] = await mySqlPool.execute(sql, values);
+
+          console.log('results: ', results);
+          console.log('fields: ', fields);
+
+          const resultsArray: any = Array.isArray(results) ? results : [];
+
+          if (resultsArray[0].affectedRows > 0) { // if successful update
+            return res.send({ message: 'User record updated' });
+          }
+          else {
+            return res.status(500).send('Problem updating user record');
           }  
         }
         catch(err) {
