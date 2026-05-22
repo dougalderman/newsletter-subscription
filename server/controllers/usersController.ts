@@ -1,10 +1,10 @@
-import type { UserType } from '../../schemas/user.schema';
-import { UserSchema } from '../../schemas/user.schema';
+import type { UserBackendType } from '../../schemas/user.schema';
+import { UserBackendSchema } from '../../schemas/user.schema';
 import type { Pool } from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import * as z from 'zod';
 
-class User implements UserType {
+class User implements UserBackendType {
   firstName: string;
   lastName: string;
   email: string;
@@ -89,7 +89,7 @@ export class UsersController {
               try {
 
                 console.log('Before parsing user: ', user);
-                const parsedUser = UserSchema.parse(user);
+                const parsedUser = UserBackendSchema.parse(user);
                 console.log('After parsing user', parsedUser);
                 
                 const sql = 'INSERT INTO Users (first_name, last_name, email, password_hash, phone_number, ' +

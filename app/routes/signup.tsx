@@ -1,4 +1,10 @@
 import { useNavigate } from 'react-router';
+import { useForm } from "react-hook-form";
+import * as z from 'zod';
+
+import { useSignup } from '../hooks/useUsers';
+import type { UserFrontEndType } from '../../schemas/user.schema';
+import { UserFrontEndSchema } from '../../schemas/user.schema';
 
 export default function Signup() {
 
@@ -7,8 +13,6 @@ export default function Signup() {
   async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
 
-    // later: call axios.post('api/newsletter/signup', payload)
-  
     const ok = true;
 
     if (ok) navigate('/email-verification');
