@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,7 +45,7 @@ export default function Signup() {
   const navigate = useNavigate();
   const signupMutation = useSignup();
 
-  const{ register, handleSubmit, watch, setError } = useForm<UserFrontEndType>({
+  const form = useForm<UserFrontEndType>({
     resolver: zodResolver(UserFrontEndSchema),
     defaultValues: {
       firstName: '',
@@ -64,9 +64,9 @@ export default function Signup() {
     },
   });
 
-  const subscriptionLevel = watch('subscriptionLevel');
+  const subscriptionLevel = form.watch('subscriptionLevel');
 
-  const onSubmit = handleSubmit(async (values) => {
+  const onSubmit = form.handleSubmit(async (values) => {
     const payload: UserFrontEndType = {
       ...values,
       phoneNumber: values.phoneNumber?.trim() || null,
@@ -80,7 +80,7 @@ export default function Signup() {
       parsed.error.issues.forEach((issue: any) => {
         const field = issue.path[0] as keyof UserFrontEndType | undefined;
         if (field) {
-          setError(field, { type: 'manual', message: issue.message });
+          form.setError(field, { type: 'manual', message: issue.message });
         }
       });
       return;
@@ -90,7 +90,7 @@ export default function Signup() {
       await signupMutation.mutateAsync(parsed.data);
       navigate('/email-verification');
     } catch (error) {
-      setError('email', {
+      form.setError('email', {
         type: 'manual',
         message:
           error instanceof Error
@@ -101,8 +101,44 @@ export default function Signup() {
   });
 
   return (
-    <main className="min-h-screen bg-slate-50 p-6 md:p-10">
-      <div className="mx-auto w-full max-w-3xl rounded-3xl bg-white p-8 shadow-lg shadow-slate-200/80">
+    <Card className="w-full sm:max-w-md">
+      <CardHeader>
+        <CardTitle>Sign Up</CardTitle>
+        <CardDescription>Fill out this form to subscribe to our newsletter.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={onSubmit} className="space-y-6">
+          <FieldGroup>
+            <Controller
+              name="firstName"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-demo-title">
+                    First name
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-demo-title"
+                    placeholder="First name"
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="off"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller  
+                  <InputGroup>             
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="space-y-2">
+              <span className="text-sm font-medium">First name</span>
+              <input
+                type="text"
+                {...register('firstName', { required: 'First name is required' })}
+                className={cn(
         <h1 className="mb-6 text-3xl font-semibold">Newsletter Signup</h1>
 
         <form onSubmit={onSubmit} className="space-y-6">
@@ -320,17 +356,19 @@ export default function Signup() {
                 : 'Signup failed. Please try again.'}
             </div>
           )}
-
-          <button
+          </form>
+        </CardContent>
+        <CardFooter>
+             <button
             type="submit"
             disabled={isSubmitting || signupMutation.isLoading}
             className="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {signupMutation.isLoading ? 'Signing up…' : 'Sign up'}
           </button>
-        </form>
-        </Form>
-      </div>
-    </main>
+        </CardFooter>
+      </Card>
+   
+        
   );
 }
