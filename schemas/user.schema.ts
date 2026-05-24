@@ -5,15 +5,19 @@ export const UserFrontEndSchema = z.object({
   lastName: z.string(),
   email: z.email(),
   password: z.string().min(8, 'Password must be at least 8 characters long'),
-  phoneNumber: z.string().nullable(),
+  confirmPassword: z.string(),
+  phoneNumber: z.string().optional(),
   streetAddress1: z.string(),
-  streetAddress2: z.string().nullable(),
+  streetAddress2: z.string().optional(),
   city: z.string(),
   county: z.string(),
   state: z.string(),
   zipCode: z.string(),
   subscriber: z.boolean(),
   subscriptionLevel: z.number(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"], // Points the error to the confirm field
 });
 
 export type UserFrontEndType = z.infer<typeof UserFrontEndSchema>;

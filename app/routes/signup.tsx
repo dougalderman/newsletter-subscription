@@ -69,8 +69,8 @@ export default function Signup() {
   const onSubmit = form.handleSubmit(async (values) => {
     const payload: UserFrontEndType = {
       ...values,
-      phoneNumber: values.phoneNumber?.trim() || null,
-      streetAddress2: values.streetAddress2?.trim() || null,
+      phoneNumber: values.phoneNumber?.trim() || undefined,
+      streetAddress2: values.streetAddress2?.trim() || undefined,
       subscriber: true,
       subscriptionLevel: Number(values.subscriptionLevel),
     };
@@ -101,80 +101,153 @@ export default function Signup() {
   });
 
   return (
-    <Card className="w-full sm:max-w-md">
-      <CardHeader>
-        <CardTitle>Sign Up</CardTitle>
-        <CardDescription>Fill out this form to subscribe to our newsletter.</CardDescription>
+    <Card className="w-full max-w-2xl">
+      <CardHeader className="text-center mb-8">
+        <CardTitle className="text-2xl font-bold">Sign Up</CardTitle>
+        <CardDescription>Please fill out this form to subscribe to our newsletter.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-6">
-          <FieldGroup>
+          <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Controller
               name="firstName"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-demo-title">
+                <Field className="space-y-2"data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="first-name">
                     First name
                   </FieldLabel>
                   <Input
                     {...field}
-                    id="form-rhf-demo-title"
+                    id="first-name"
                     placeholder="First name"
                     aria-invalid={fieldState.invalid}
                     autoComplete="off"
                   />
                   {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
+                    <FieldError errors={[fieldState.error]}/>
                   )}
                 </Field>
               )}
             />
-            <Controller  
-                  <InputGroup>             
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="space-y-2">
-              <span className="text-sm font-medium">First name</span>
-              <input
-                type="text"
-                {...register('firstName', { required: 'First name is required' })}
-                className={cn(
-        <h1 className="mb-6 text-3xl font-semibold">Newsletter Signup</h1>
-
-        <form onSubmit={onSubmit} className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="space-y-2">
-              <span className="text-sm font-medium">First name</span>
-              <input
-                type="text"
-                {...register('firstName', { required: 'First name is required' })}
-                className={cn(
-                  'w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-base text-slate-900 shadow-sm transition focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200',
-                  errors.firstName && 'border-red-500'
-                )}
-              />
-              {errors.firstName && (
-                <p className="text-sm text-red-600">{errors.firstName.message}</p>
+            <Controller
+              name="lastName"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field className="space-y-2" data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="last-name">
+                    Last name
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="last-name"
+                    placeholder="Last name"
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="off"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]}/>
+                  )}
+                </Field>
               )}
-            </label>
+            />
+          </FieldGroup>
 
-            <label className="space-y-2">
-              <span className="text-sm font-medium">Last name</span>
-              <input
-                type="text"
-                {...register('lastName', { required: 'Last name is required' })}
-                className={cn(
-                  'w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-base text-slate-900 shadow-sm transition focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200',
-                  errors.lastName && 'border-red-500'
-                )}
-              />
-              {errors.lastName && (
-                <p className="text-sm text-red-600">{errors.lastName.message}</p>
+          <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Controller
+              name="email"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field className="space-y-2"data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="email">
+                    Email
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="email"
+                    placeholder="Email"
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="off"
+                    type="email"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]}/>
+                  )}
+                </Field>
               )}
-            </label>
-          </div>
+            />
+            <Controller
+              name="phoneNumber"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field className="space-y-2" data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="phone-number">
+                    Phone number
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="phone-number"
+                    placeholder="Phone number"
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="off"
+                    type="tel"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]}/>
+                  )}
+                </Field>
+              )}
+            />
+          </FieldGroup>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Controller
+              name="password"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field className="space-y-2"data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="password">
+                    Password
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="password"
+                    placeholder="Password"
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="off"
+                    type="password"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]}/>
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="confirmPassword"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field className="space-y-2" data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="confirm-password">
+                    Confirm password
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="confirm-password"
+                    placeholder="Confirm password"
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="off"
+                    type="password"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]}/>
+                  )}
+                </Field>
+              )}
+            />
+          </FieldGroup>           
+           
+       {/*   <div className="grid gap-4 sm:grid-cols-2">
             <label className="space-y-2">
               <span className="text-sm font-medium">Email</span>
               <input
@@ -355,17 +428,17 @@ export default function Signup() {
                 ? signupMutation.error.message
                 : 'Signup failed. Please try again.'}
             </div>
-          )}
+          )} */}
           </form>
         </CardContent>
         <CardFooter>
-             <button
+             {/* <button
             type="submit"
-            disabled={isSubmitting || signupMutation.isLoading}
+             disabled={isSubmitting || signupMutation.isLoading}
             className="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {signupMutation.isLoading ? 'Signing up…' : 'Sign up'}
-          </button>
+          </button> */}
         </CardFooter>
       </Card>
    

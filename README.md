@@ -4,7 +4,7 @@ A newsletter subscription form with different subscription levels and email veri
 
 ## Requirements
 
-The form will have fields for first name, last name, email, password, password again, phone number, street address1, street address2, county, state, zip code, and a selection of different subscription levels. Here are the levels:
+The form will have fields for first name, last name, email, password,confirm password, phone number, street address1, street address2, county, state, zip code, and a selection of different subscription levels. Here are the levels:
 
 1)	Free
 2)	$5/month
