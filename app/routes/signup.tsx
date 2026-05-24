@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import {
   Field,
+  FieldContent,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -25,21 +26,19 @@ import {
   SelectValue,    
 } from "@/components/ui/select";
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
-import { cn } from '../lib/utils';
 import { useSignup } from '../hooks/useUsers';
 import type { UserFrontEndType } from '../../schemas/user.schema';
 import { UserFrontEndSchema } from '../../schemas/user.schema';
 
 const subscriptionOptions = [
-  { value: 0, label: 'Free' },
-  { value: 5, label: '$5/month' },
-  { value: 10, label: '$10/month' },
-  { value: 15, label: '$15/month' },
-  { value: 20, label: '$20/month' },
-  { value: 25, label: '$25/month' },
-  { value: 50, label: '$50/month (max)' }
+  { value: '0', label: 'Free' },
+  { value: '5', label: '$5/month' },
+  { value: '10', label: '$10/month' },
+  { value: '15', label: '$15/month' },
+  { value: '20', label: '$20/month' },
+  { value: '25', label: '$25/month' },
+  { value: '50', label: '$50/month (max)' }
 ]  
 
 export default function Signup() {
@@ -55,6 +54,7 @@ export default function Signup() {
       lastName: '',
       email: '',
       password: '',
+      confirmPassword: '',
       phoneNumber: '',
       streetAddress1: '',
       streetAddress2: '',
@@ -63,11 +63,9 @@ export default function Signup() {
       state: '',
       zipCode: '',
       subscriber: false,
-      subscriptionLevel: 0,
+      subscriptionLevel: '',
     },
   });
-
-  const subscriptionLevel = form.watch('subscriptionLevel');
 
   const onSubmit = form.handleSubmit(async (values) => {
     submitted = true;
@@ -76,7 +74,7 @@ export default function Signup() {
       phoneNumber: values.phoneNumber?.trim() || undefined,
       streetAddress2: values.streetAddress2?.trim() || undefined,
       subscriber: true,
-      subscriptionLevel: Number(values.subscriptionLevel),
+      subscriptionLevel: values.subscriptionLevel,
     };
 
     const parsed = UserFrontEndSchema.safeParse(payload);
@@ -96,7 +94,7 @@ export default function Signup() {
       navigate('/email-verification');
     } catch (error) {
       submitted = false;
-      form.setError('email', {
+      form.setError('root', {
         type: 'manual',
         message:
           error instanceof Error
@@ -400,15 +398,21 @@ export default function Signup() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field className="space-y-2" orientation="responsive" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="subscriptionLevel">
-                    Subscription Level
-                  </FieldLabel>
+                  <FieldContent>
+                    <FieldLabel htmlFor="subscriptionLevel">
+                      Subscription Level
+                    </FieldLabel>
+                  </FieldContent>
                   <Select
                     name={field.name}
                     value={String(field.value)}
                     onValueChange={field.onChange}
                   >
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger
+                      id="subscriptionLevel"
+                      aria-invalid={fieldState.invalid}
+                      className="w-[180px]"
+                     >
                       <SelectValue placeholder="Select subscription level" />
                     </SelectTrigger>
                     <SelectContent>
@@ -421,9 +425,9 @@ export default function Signup() {
                       </SelectGroup>
                     </SelectContent>
                   </Select>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]}/>
-                  )}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]}/>
+                    )}
                 </Field>
               )}
             />
@@ -439,9 +443,13 @@ export default function Signup() {
         >
           Submit
         </Button>
+        {/* Use FormMessage to display the root error */}
+          {form.formState.errors.root && (
+            <p className="text-sm font-medium text-destructive ml-4">
+              {form.formState.errors.root.message}
+            </p>
+          )}
       </CardFooter>
     </Card>
-   
-        
   );
 }

@@ -83,7 +83,7 @@ export class UsersController {
                 req.body.state,
                 req.body.zipCode,
                 req.body.subscriber,
-                req.body.subscriptionLevel,
+                Number(req.body.subscriptionLevel),
               );
 
               try {
