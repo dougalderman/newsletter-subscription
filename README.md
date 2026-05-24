@@ -1,6 +1,6 @@
 # React Newsletter Subscription
 
-A newsletter subscription form with different subscription levels and email verification, and an analytics page.
+A newsletter subscription form for U.S.-based subscribers, with different subscription levels and email verification, and an analytics page.
 
 ## Requirements
 

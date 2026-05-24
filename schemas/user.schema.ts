@@ -6,7 +6,8 @@ export const UserFrontEndSchema = z.object({
   email: z.email(),
   password: z.string().min(8, 'Password must be at least 8 characters long'),
   confirmPassword: z.string(),
-  phoneNumber: z.string().optional(),
+  phoneNumber: z.string().regex(/^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/
+  , 'Invalid phone number format').optional(),
   streetAddress1: z.string(),
   streetAddress2: z.string().optional(),
   city: z.string(),
