@@ -1,19 +1,30 @@
-import type { EmailVerificationType } from '../../schemas/emailVerification.schema'; 
-import { EmailVerificationSchema } from '../../schemas/emailVerification.schema';
+import type { EmailVerificationBackEndType } from '../../schemas/emailVerification.schema'; 
+import { EmailVerificationBackEndSchema } from '../../schemas/emailVerification.schema';
 import type { Pool } from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import * as z from 'zod';
 
-class EmailVerification implements EmailVerificationType {
+class EmailVerification implements EmailVerificationBackEndType {
   email: string;
+  otpHash: string;
   
   constructor(
-    email: string
+    email: string,
+    otpHash: string
   ) {
     this.email = email;
+    this.otpHash = otpHash;
   }
 }
 
+function generateOtp(): string {
+  // Generate a random number between 0 and 999999
+  const num = Math.floor(Math.random() * 1000000);
+  
+  // Convert the number to a string and pad with leading zeros if necessary
+  return num.toString().padStart(6, '0');
+}
+  
 export class EmailVerificationsController {
 
   static createEmailVerification(mySqlPool: Pool): any {
@@ -26,20 +37,8 @@ export class EmailVerificationsController {
       if (req.body && req.body.email) {
         console.log('req.body.email: ', req.body.email);
 
-        const emailVerification = new EmailVerification(
-          req.body.email
-        );
-  
         const otp: string = generateOtp();
         console.log('Generated OTP: ', otp);
-  
-        function generateOtp(): string {
-          // Generate a random number between 0 and 999999
-          const num = Math.floor(Math.random() * 1000000);
-          
-          // Convert the number to a string and pad with leading zeros if necessary
-          return num.toString().padStart(6, '0');
-        }
   
         bcrypt.hash(otp, Number(process.env.SALT_ROUNDS), async function(err, hash) {
           if (err) {
@@ -52,15 +51,19 @@ export class EmailVerificationsController {
             console.log('OTP hash length: ', otpHash.length);
 
             try {
+              const emailVerification = new EmailVerification(
+                req.body.email,
+                otpHash
+              );
 
-              EmailVerificationSchema.parse(emailVerification);
+              EmailVerificationBackEndSchema.parse(emailVerification);
               
               const sql = 'INSERT INTO EmailVerifications (email, verification_code_hash, expires_at) ' +
                   'VALUES(?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))';
               
               const values = [
                   emailVerification.email,
-                  otpHash
+                  emailVerification.otpHash
                 ]
         
                 try {
@@ -92,7 +95,6 @@ export class EmailVerificationsController {
   
   static verifyEmail(mySqlPool: Pool): any {
     
-    let userSubmittedOtpHash: string = '';
     let storedOtpHash: string = '';
     let expiresAt: Date;
 

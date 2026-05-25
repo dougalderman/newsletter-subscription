@@ -1,6 +1,6 @@
-import { useNavigate } from 'react-router';
+import * as React from 'react';
+import { useLocation } from 'react-router-dom';
 import { Controller, useForm } from 'react-hook-form';
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,61 +12,57 @@ import {
 } from "@/components/ui/card";
 import {
   Field,
-  FieldContent,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
 
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot
+} from "@/components/ui/input-otp";
+
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { useVerifyEmail } from '../hooks/useUsers';
-import { EmailVerificationSchema } from '../../schemas/emailVerification.schema';
-import type { EmailVerificationType } from '../../schemas/emailVerification.schema';
+import { EmailVerificationFrontEndSchema } from '../../schemas/emailVerification.schema';
+import type { EmailVerificationFrontEndType } from '../../schemas/emailVerification.schema';
 
 export default function EmailVerification() {
 
-  const navigate = useNavigate();
-  const signupMutation = useSignup();
+  const location = useLocation();
 
-  const form = useForm<UserFrontEndType>({
-    resolver: zodResolver(UserFrontEndSchema),
+  if (location && location.state) {
+    const email = location.state.email;
+    console.log('Email from location state: ', email);
+  }
+
+  const signupMutation = useVerifyEmail();
+
+  const form = useForm<EmailVerificationFrontEndType>({
+    resolver: zodResolver(EmailVerificationFrontEndSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
       email: '',
-      password: '',
-      confirmPassword: '',
-      phoneNumber: '',
-      streetAddress1: '',
-      streetAddress2: '',
-      city: '',
-      county: '',
-      state: '',
-      zipCode: '',
-      subscriber: false,
-      subscriptionLevel: '',
+      otp: ''
     },
   });
 
+  const [value, setValue] : [string, React.Dispatch<React.SetStateAction<string>>] = React.useState('');
+
   // Extract the loading state
   const { isSubmitting, isDirty } = form.formState;
-  console.log('isSubmitting: ', isSubmitting);
-  console.log('isDirty: ', isDirty);
-
-  const onSubmit = form.handleSubmit(async (values) => {
-    const payload: UserFrontEndType = {
-      ...values,
-      phoneNumber: values.phoneNumber?.trim() || undefined,
-      streetAddress2: values.streetAddress2?.trim() || undefined,
-      subscriber: true,
-      subscriptionLevel: values.subscriptionLevel,
+  
+  const onSubmit = form.handleSubmit(async (values: EmailVerificationFrontEndType) => {
+    const payload: EmailVerificationFrontEndType = {
+      email: values.email,
+      otp: values.otp
     };
 
-    const parsed = UserFrontEndSchema.safeParse(payload);
+    const parsed = EmailVerificationFrontEndSchema.safeParse(payload);
     if (!parsed.success) {
       parsed.error.issues.forEach((issue: any) => {
-        const field = issue.path[0] as keyof UserFrontEndType | undefined;
+        const field = issue.path[0] as keyof EmailVerificationFrontEndType | undefined;
         if (field) {
           form.setError(field, { type: 'manual', message: issue.message });
         }
@@ -76,14 +72,13 @@ export default function EmailVerification() {
 
     try {
       await signupMutation.mutateAsync(parsed.data);
-      navigate('/email-verification');
     } catch (error) {
       form.setError('root', {
         type: 'manual',
         message:
           error instanceof Error
             ? error.message
-            : 'Unable to complete signup. Please try again.',
+            : 'Unable to complete email verification. Please try again.',
       });
     }
   });
@@ -91,338 +86,56 @@ export default function EmailVerification() {
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader className="text-center mb-8">
-        <CardTitle className="text-2xl font-bold">Sign Up</CardTitle>
-        <CardDescription>Please fill out this form to subscribe to our newsletter.</CardDescription>
+        <CardTitle className="text-2xl font-bold">Email Verification</CardTitle>
+        <CardDescription>Please enter the six digit code sent to your email to complete the newsletter signup process.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form id="signup-form" onSubmit={onSubmit} className="space-y-6">
+        <form id="email-verification-form" onSubmit={onSubmit} className="space-y-6">
           <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Controller
-              name="firstName"
+              name="otp"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field className="space-y-2"data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="first-name">
-                    First name
+                  <FieldLabel htmlFor="otp">
+                    Six Digit Code
                   </FieldLabel>
-                  <Input
+                  <InputOTP
                     {...field}
-                    id="first-name"
-                    placeholder="First name"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="off"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]}/>
-                  )}
-                </Field>
-              )}
-            />
-            <Controller
-              name="lastName"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field className="space-y-2" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="last-name">
-                    Last name
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="last-name"
-                    placeholder="Last name"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="off"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]}/>
-                  )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-
-          <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Controller
-              name="email"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field className="space-y-2"data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="email">
-                    Email
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="email"
-                    placeholder="Email"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="off"
-                    type="email"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]}/>
-                  )}
-                </Field>
-              )}
-            />
-            <Controller
-              name="phoneNumber"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field className="space-y-2" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="phone-number">
-                    Phone number
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="phone-number"
-                    placeholder="Phone number"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="off"
-                    type="tel"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]}/>
-                  )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-
-          <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Controller
-              name="password"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field className="space-y-2"data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="password">
-                    Password
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="password"
-                    placeholder="Password"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="off"
-                    type="password"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]}/>
-                  )}
-                </Field>
-              )}
-            />
-            <Controller
-              name="confirmPassword"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field className="space-y-2" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="confirm-password">
-                    Confirm password
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="confirm-password"
-                    placeholder="Confirm password"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="off"
-                    type="password"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]}/>
-                  )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-
-          <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Controller
-              name="streetAddress1"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field className="space-y-2"data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="street-address-1">
-                    Street Address 1
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="street-address-1"
-                    placeholder="Street Address 1"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="off"
-                    type="text"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]}/>
-                  )}
-                </Field>
-              )}
-            />
-            <Controller
-              name="streetAddress2"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field className="space-y-2" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="street-address-2">
-                    Street Address 2
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="street-address-2"
-                    placeholder="Street Address 2"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="off"
-                    type="text666666666666666666666666666666666"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]}/>
-                  )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-
-          <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Controller
-              name="city"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field className="space-y-2"data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="city">
-                    City
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="city"
-                    placeholder="City"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="off"
-                    type="text"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]}/>
-                  )}
-                </Field>
-              )}
-            />
-            <Controller
-              name="state"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field className="space-y-2"data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="state">
-                    State
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="state"
-                    placeholder="State"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="off"
-                    type="text"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]}/>
-                  )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-
-          <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Controller
-              name="zipCode"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field className="space-y-2" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="zipCode">
-                    ZIP Code
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="zipCode"
-                    placeholder="ZIP Code"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="off"
-                    type="text"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]}/>
-                  )}
-                </Field>
-              )}
-            />
-            <Controller
-              name="county"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field className="space-y-2" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="county">
-                    County
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="county"
-                    placeholder="County"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="off"
-                    type="text666666666666666666666666666666666"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]}/>
-                  )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-
-          <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Controller
-              name="subscriptionLevel"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field className="space-y-2" orientation="responsive" data-invalid={fieldState.invalid}>
-                  <FieldContent>
-                    <FieldLabel htmlFor="subscriptionLevel">
-                      Subscription Level
-                    </FieldLabel>
-                  </FieldContent>
-                  <Select
-                    name={field.name}
-                    value={String(field.value)}
-                    onValueChange={field.onChange}
+                    maxLength={6}
+                    value={value}
+                    onChangeCapture={(e) => setValue(e.target.value)}
                   >
-                    <SelectTrigger
-                      id="subscriptionLevel"
-                      aria-invalid={fieldState.invalid}
-                      className="w-[180px]"
-                     >
-                      <SelectValue placeholder="Select subscription level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {subscriptionOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]}/>
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                  </InputOTPGroup>
+                </InputOTP>  
+                  <div className="text-center text-sm">
+                    {value === "" ? (
+                      <>Enter your 6-digit code</>
+                    ) : (
+                      <>You entered: {value}</>
                     )}
+                  </div>
+                   {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]}/>
+                  )}
                 </Field>
+                 
               )}
             />
           </FieldGroup>    
-           
         </form>
       </CardContent>
       <CardFooter>
         <Button
           type="submit"
-          form="signup-form"
+          form="email-verification-form"
           disabled={isSubmitting || !isDirty}
         >
           {isSubmitting ? "Submitting..." : "Submit"}
@@ -431,6 +144,12 @@ export default function EmailVerification() {
           {form.formState.errors.root && (
             <p className="text-sm font-medium text-destructive ml-4">
               {form.formState.errors.root.message}
+            </p>
+          )}
+        {/* Use FormMessage to display success message */}
+          {form.formState.isSubmitSuccessful && (
+            <p className="text-sm font-medium text-green-600 ml-4">
+              Email verification successful! You will now receive our newsletter.
             </p>
           )}
       </CardFooter>

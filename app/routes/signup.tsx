@@ -91,7 +91,7 @@ export default function Signup() {
 
     try {
       await signupMutation.mutateAsync(parsed.data);
-      navigate('/email-verification');
+      navigate('/email-verification', {state: {id: 1, email: parsed.data.email} });
     } catch (error) {
       form.setError('root', {
         type: 'manual',
