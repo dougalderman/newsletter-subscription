@@ -68,9 +68,7 @@ export default function Signup() {
 
   // Extract the loading state
   const { isSubmitting, isDirty } = form.formState;
-  console.log('isSubmitting: ', isSubmitting);
-  console.log('isDirty: ', isDirty);
-
+  
   const onSubmit = form.handleSubmit(async (values) => {
     const payload: UserFrontEndType = {
       ...values,

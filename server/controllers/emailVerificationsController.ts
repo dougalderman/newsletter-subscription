@@ -94,12 +94,13 @@ export class EmailVerificationsController {
     
     let userSubmittedOtpHash: string = '';
     let storedOtpHash: string = '';
+    let expiresAt: Date;
 
-    return async (req: any, res: any) => {
+    return async (req: any, res: any, next:any) => {
       console.log('Request body verify email: ', req.body);
 
       if (req.body && req.body.email && req.body.otp) {
-        const sql = 'SELECT verification_code_hashed FROM EmailVerifications WHERE email = ?';
+        const sql = 'SELECT verification_code_hash, expires_at FROM EmailVerifications WHERE email = ?';
         
         const values = [
             req.body.email
@@ -112,17 +113,27 @@ export class EmailVerificationsController {
             console.log('fields: ', fields);
   
             if (Array.isArray(results) && results.length > 0) {
-              storedOtpHash = String(results[0]);
+              const resultsObj: any = results[0];
+              storedOtpHash = String(resultsObj.verification_code_hash);
+              expiresAt = new Date(resultsObj.expires_at);
 
-              bcrypt.hash(req.body.otp, Number(process.env.SALT_ROUNDS), function(err, hash) {
+              if (new Date() >= expiresAt) {
+                return res.status(400).send({message: 'OTP is expired'});
+              }
+
+              bcrypt.compare(req.body.otp, storedOtpHash, (err, result) => {
                 if (err) {
-                  console.log('Error hashing OTP ', err);
-                  return res.status(500).send('Error hashing OTP');
+                  console.log('Error verifyingg OTP', err);
+                  return res.status(500).send('Error verifying OTP');
                 }
                 else {
-                  userSubmittedOtpHash = hash;
-                  if (userSubmittedOtpHash === storedOtpHash) {
-                    return res.send({ message: 'OTP verified' });
+                  console.log('result: ', result);
+                  if (result) {
+                    console.log('OTP verified');
+                    next();
+                  }
+                  else {
+                    return res.status(400).send('Submitted OTP is invalid');
                   } 
                 }  
               });    

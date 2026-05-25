@@ -199,14 +199,12 @@ export class UsersController {
         const values = [req.body.email];
 
         try {
-          const [results, fields] = await mySqlPool.execute(sql, values);
+          const [results, fields]: [any, any] = await mySqlPool.execute(sql, values);
 
           console.log('results: ', results);
           console.log('fields: ', fields);
 
-          const resultsArray: any = Array.isArray(results) ? results : [];
-
-          if (resultsArray[0].affectedRows > 0) { // if successful update
+          if (results && results.affectedRows === 1) { // if successful update
             return res.send({ message: 'User record updated' });
           }
           else {
