@@ -43,7 +43,6 @@ const subscriptionOptions = [
 
 export default function Signup() {
 
-  let submitted: boolean = false;
   const navigate = useNavigate();
   const signupMutation = useSignup();
 
@@ -67,8 +66,12 @@ export default function Signup() {
     },
   });
 
+  // Extract the loading state
+  const { isSubmitting, isDirty } = form.formState;
+  console.log('isSubmitting: ', isSubmitting);
+  console.log('isDirty: ', isDirty);
+
   const onSubmit = form.handleSubmit(async (values) => {
-    submitted = true;
     const payload: UserFrontEndType = {
       ...values,
       phoneNumber: values.phoneNumber?.trim() || undefined,
@@ -85,7 +88,6 @@ export default function Signup() {
           form.setError(field, { type: 'manual', message: issue.message });
         }
       });
-      submitted = false;
       return;
     }
 
@@ -93,7 +95,6 @@ export default function Signup() {
       await signupMutation.mutateAsync(parsed.data);
       navigate('/email-verification');
     } catch (error) {
-      submitted = false;
       form.setError('root', {
         type: 'manual',
         message:
@@ -322,31 +323,6 @@ export default function Signup() {
               )}
             />
             <Controller
-              name="county"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field className="space-y-2" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="county">
-                    County
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="county"
-                    placeholder="County"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="off"
-                    type="text666666666666666666666666666666666"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]}/>
-                  )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-
-          <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Controller
               name="state"
               control={form.control}
               render={({ field, fieldState }) => (
@@ -368,7 +344,10 @@ export default function Signup() {
                 </Field>
               )}
             />
-           <Controller
+          </FieldGroup>
+
+          <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Controller
               name="zipCode"
               control={form.control}
               render={({ field, fieldState }) => (
@@ -383,6 +362,28 @@ export default function Signup() {
                     aria-invalid={fieldState.invalid}
                     autoComplete="off"
                     type="text"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]}/>
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="county"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field className="space-y-2" data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="county">
+                    County
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="county"
+                    placeholder="County"
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="off"
+                    type="text666666666666666666666666666666666"
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]}/>
@@ -439,9 +440,9 @@ export default function Signup() {
         <Button
           type="submit"
           form="signup-form"
-          disabled={submitted}
+          disabled={isSubmitting || !isDirty}
         >
-          Submit
+          {isSubmitting ? "Submitting..." : "Submit"}
         </Button>
         {/* Use FormMessage to display the root error */}
           {form.formState.errors.root && (
