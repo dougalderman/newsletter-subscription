@@ -1,5 +1,5 @@
-import type { EmailVerificationType } from '../../schemas/emailVerifications.schema'; 
-import { EmailVerificationSchema } from '../../schemas/emailVerifications.schema';
+import type { EmailVerificationType } from '../../schemas/emailVerification.schema'; 
+import { EmailVerificationSchema } from '../../schemas/emailVerification.schema';
 import type { Pool } from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import * as z from 'zod';
