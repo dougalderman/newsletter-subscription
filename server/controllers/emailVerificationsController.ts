@@ -120,13 +120,13 @@ export class EmailVerificationsController {
               expiresAt = new Date(resultsObj.expires_at);
 
               if (new Date() >= expiresAt) {
-                return res.status(400).send({message: 'OTP is expired'});
+                return res.status(400).send({message: 'Verification code is expired'});
               }
 
               bcrypt.compare(req.body.otp, storedOtpHash, (err, result) => {
                 if (err) {
                   console.log('Error verifyingg OTP', err);
-                  return res.status(500).send('Error verifying OTP');
+                  return res.status(500).send('Error verifying code');
                 }
                 else {
                   console.log('result: ', result);
@@ -135,13 +135,13 @@ export class EmailVerificationsController {
                     next();
                   }
                   else {
-                    return res.status(400).send('Submitted OTP is invalid');
+                    return res.status(400).send('Verification code is invalid');
                   } 
                 }  
               });    
             }
             else {
-              return res.status(400).send({ message: 'No OTP found for this email' });
+              return res.status(400).send({ message: 'No verification code found for this email' });
             }
           }   
           catch(err) {

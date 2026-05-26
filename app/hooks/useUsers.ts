@@ -24,9 +24,6 @@ export const useVerifyEmail = () => {
   
   return useMutation({
     mutationFn: verifyEmail,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['analytics'] });
-    },
   });
 };
 

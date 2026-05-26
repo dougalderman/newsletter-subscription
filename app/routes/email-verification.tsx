@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import { Controller, useForm } from 'react-hook-form';
 import { Button } from "@/components/ui/button";
 import {
@@ -31,21 +31,39 @@ import type { EmailVerificationFrontEndType } from '../../schemas/emailVerificat
 
 export default function EmailVerification() {
 
+  const navigate = useNavigate();
   const location = useLocation();
+  const email =
+    typeof location.state === 'object' &&
+    location.state !== null &&
+    'email' in location.state &&
+    typeof (location.state as { email?: unknown }).email === 'string'
+      ? (location.state as { email: string }).email
+      : '';
 
-  if (location && location.state) {
-    const email = location.state.email;
-  }
+  console.log('email: ', email);
 
   const verifyMutation = useVerifyEmail();
 
   const form = useForm<EmailVerificationFrontEndType>({
     resolver: zodResolver(EmailVerificationFrontEndSchema),
     defaultValues: {
+      // Keep initial markup SSR/client consistent. We'll populate `email` after hydration.
       email: '',
       otp: ''
     },
   });
+
+  React.useEffect(() => {
+    console.log('in useEffect()');
+    console.log('email: ', email);
+    if (!email) {
+      navigate('/signup', { replace: true });
+      return;
+    }
+    // Populate `email` after hydration so it doesn't cause SSR/client markup mismatches.
+    form.setValue('email', email, { shouldDirty: false });
+  }, [email, navigate, form]);
 
   const [value, setValue] : [string, React.Dispatch<React.SetStateAction<string>>] = React.useState('');
 
@@ -72,14 +90,21 @@ export default function EmailVerification() {
     }
 
     try {
-      console.log('in signup')
+      console.log('before await verifyMutation');
       await verifyMutation.mutateAsync(parsed.data);
-    } catch (error) {
+      console.log('after await verifyMutation');
+    } catch (error: any) {
+      console.log('error: ', error);
+      let err: string = '';
+      if (error.response && error.response.data) {
+        console.log('error.response: ', error.response);
+        err = error.response.data.message;
+      }
       form.setError('root', {
         type: 'manual',
         message:
-          error instanceof Error
-            ? error.message
+          err
+            ? err
             : 'Unable to complete email verification. Please try again.',
       });
     }

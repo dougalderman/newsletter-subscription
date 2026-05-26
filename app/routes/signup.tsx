@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Controller, useForm } from 'react-hook-form';
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,10 @@ export default function Signup() {
 
   const navigate = useNavigate();
   const signupMutation = useSignup();
+  // Need another variable to handle the case when isSubmitting is false after form
+  // completes submission processing but before it navigates to the email-verification.
+  // This will prevent the user from being able to double-click Submit for the same form values.
+  const [submitting, setSubmitting] = useState(false);
 
   const form = useForm<UserFrontEndType>({
     resolver: zodResolver(UserFrontEndSchema),
@@ -70,6 +75,7 @@ export default function Signup() {
   const { isSubmitting, isDirty } = form.formState;
   
   const onSubmit = form.handleSubmit(async (values) => {
+    setSubmitting(true);
     const payload: UserFrontEndType = {
       ...values,
       phoneNumber: values.phoneNumber?.trim() || undefined,
@@ -86,6 +92,7 @@ export default function Signup() {
           form.setError(field, { type: 'manual', message: issue.message });
         }
       });
+      setSubmitting(false);
       return;
     }
 
@@ -100,6 +107,7 @@ export default function Signup() {
             ? error.message
             : 'Unable to complete signup. Please try again.',
       });
+      setSubmitting(false);
     }
   });
 
@@ -438,9 +446,9 @@ export default function Signup() {
         <Button
           type="submit"
           form="signup-form"
-          disabled={isSubmitting || !isDirty}
+          disabled={isSubmitting || submitting || !isDirty}
         >
-          {isSubmitting ? "Submitting..." : "Submit"}
+          {isSubmitting || submitting ? "Submitting..." : "Submit"}
         </Button>
         {/* Use FormMessage to display the root error */}
           {form.formState.errors.root && (
