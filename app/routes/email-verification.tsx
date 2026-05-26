@@ -33,6 +33,8 @@ export default function EmailVerification() {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const [verifiedSubscriber, setVerifiedSubscriber] = React.useState(false);
+  
   const email =
     typeof location.state === 'object' &&
     location.state !== null &&
@@ -85,6 +87,7 @@ export default function EmailVerification() {
 
     try {
       await verifyMutation.mutateAsync(parsed.data);
+      setVerifiedSubscriber(true);
     } catch (error: any) {
       let err: string = '';
       if (error && error.response && error.response.data) {
@@ -159,9 +162,9 @@ export default function EmailVerification() {
         <Button
           type="submit"
           form="email-verification-form"
-          disabled={isSubmitting || !isDirty}
+          disabled={isSubmitting || !isDirty || verifiedSubscriber}
         >
-          {isSubmitting ? "Submitting..." : "Submit"}
+          {(isSubmitting) ? "Submitting..." : "Submit"}
         </Button>
         {/* Use FormMessage to display the root error */}
           {form.formState.errors.root && (
@@ -172,7 +175,7 @@ export default function EmailVerification() {
         {/* Use FormMessage to display success message */}
           {form.formState.isSubmitSuccessful && (
             <p className="text-sm font-medium text-green-600 ml-4">
-              Email verification successful! You will now receive our newsletter.
+              Email verification successful! You will now receive our newsletter. You can close this window.
             </p>
           )}
       </CardFooter>
