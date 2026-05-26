@@ -35,8 +35,6 @@ export class SendEmailController {
 
       if (req.body && req.body.email && req.otp) {
 
-        console.log('Request body send email: ', req.body);
-
         await transporter.sendMail({
           from: process.env.SMTP_SEND_FROM,
           to: req.body.email,
@@ -45,12 +43,11 @@ export class SendEmailController {
           `Please enter the following code into the verification field: ${req.otp}.\n\nThis code will expire in 10 minutes.`,
         })
         .then((results: any) => {
-          console.log('Message sent: %s', results.messageId);
           return res.send(results);
         })
         .catch((err: any) => {
           console.error(err);
-          return res.status(500).send(err);
+          return res.status(500).send('Error sending verfiication code.');
         })
       }
     }  

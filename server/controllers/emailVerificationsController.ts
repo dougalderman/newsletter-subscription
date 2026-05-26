@@ -36,6 +36,7 @@ export class EmailVerificationsController {
       if (req.body && req.body.email) {
 
         const otp: string = generateOtp();
+        console.log('otp: ', otp);
   
         bcrypt.hash(otp, Number(process.env.SALT_ROUNDS), async function(err, hash) {
           if (err) {
