@@ -35,10 +35,9 @@ export default function EmailVerification() {
 
   if (location && location.state) {
     const email = location.state.email;
-    console.log('Email from location state: ', email);
   }
 
-  const signupMutation = useVerifyEmail();
+  const verifyMutation = useVerifyEmail();
 
   const form = useForm<EmailVerificationFrontEndType>({
     resolver: zodResolver(EmailVerificationFrontEndSchema),
@@ -54,6 +53,7 @@ export default function EmailVerification() {
   const { isSubmitting, isDirty } = form.formState;
   
   const onSubmit = form.handleSubmit(async (values: EmailVerificationFrontEndType) => {
+    console.log('in onSubmit');
     const payload: EmailVerificationFrontEndType = {
       email: values.email,
       otp: values.otp
@@ -61,6 +61,7 @@ export default function EmailVerification() {
 
     const parsed = EmailVerificationFrontEndSchema.safeParse(payload);
     if (!parsed.success) {
+      console.log('parsing error');
       parsed.error.issues.forEach((issue: any) => {
         const field = issue.path[0] as keyof EmailVerificationFrontEndType | undefined;
         if (field) {
@@ -71,7 +72,8 @@ export default function EmailVerification() {
     }
 
     try {
-      await signupMutation.mutateAsync(parsed.data);
+      console.log('in signup')
+      await verifyMutation.mutateAsync(parsed.data);
     } catch (error) {
       form.setError('root', {
         type: 'manual',
