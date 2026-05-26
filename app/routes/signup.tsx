@@ -99,13 +99,23 @@ export default function Signup() {
     try {
       await signupMutation.mutateAsync(parsed.data);
       navigate('/email-verification', {state: {id: 1, email: parsed.data.email} });
-    } catch (error) {
+    } catch (error: any) {
+      let err: string = '';
+      if (error && error.response && error.response.data) {
+        console.error('error.response: ', error.response);
+        if (error.response.data.message) {
+          err = error.response.data.message;
+        }
+        else {
+          err = error.response.data;
+        }
+      }
       form.setError('root', {
         type: 'manual',
         message:
-          error instanceof Error
-            ? error.message
-            : 'Unable to complete signup. Please try again.',
+          err
+            ? err
+            : 'Unable to complete email verification. Please try again.',
       });
       setSubmitting(false);
     }

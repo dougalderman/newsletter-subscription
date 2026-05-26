@@ -57,18 +57,16 @@ export class UsersController {
     let passwordHash: string = '';
 
     return (req: any, res: any, next: any) => {
-      console.log('Request body create user: ', req.body);
 
       if (req.body) {
         if (req.body.password) {
           bcrypt.hash(req.body.password, Number(process.env.SALT_ROUNDS), async function(err, hash) {
             if (err) {
               console.error('Error hashing password: ', err);
-              return res.status(500).send('Error hashing password');
+              return res.status(500).send('Error processing form');
             }
             else {
               passwordHash = hash;
-              console.log('Password hash: ', passwordHash);
 
               const user = new User(
                 req.body.firstName,
@@ -88,9 +86,7 @@ export class UsersController {
 
               try {
 
-                console.log('Before parsing user: ', user);
                 const parsedUser = UserBackendSchema.parse(user);
-                console.log('After parsing user', parsedUser);
                 
                 const sql = 'INSERT INTO Users (first_name, last_name, email, password_hash, phone_number, ' +
                     'street_address1, street_address2, city, county, state, zip_code, subscriber, subscription_level, verified, ' +
@@ -115,20 +111,17 @@ export class UsersController {
                   try {
                     const [results, fields] = await mySqlPool.execute(sql, values);
 
-                    console.log('results: ', results);
-                    console.log('fields: ', fields);
-
                     next();
                   }  
                   catch(err) {
                     console.error('error executing SQL: ', err);
-                    return res.status(500).send(err);
+                    return res.status(500).send('Database error');
                   }
               }
               catch(err) {
                 if (err instanceof z.ZodError) {
                   console.error('Validation error: ', err.issues);  
-                  return res.status(400).send(err.issues);
+                  return res.status(400).send('Validation error');
                 }
                 else {
                   console.error('Unknown error: ', err);
@@ -139,11 +132,8 @@ export class UsersController {
           });  
         }
         else {
-          console.error('Password is required');
-          return res.status(400).json({
-            error: 'password is required',
-            receivedKeys: Object.keys(req.body ?? {}),
-          });
+          console.error('Password not received in request body');
+          return res.status(400).send('Error processing form');
         }    
       }
     }  
@@ -152,10 +142,8 @@ export class UsersController {
   static checkEmailUniqueness(mySqlPool: Pool): any {
     
     return async (req: any, res: any, next: any) => {
-      console.log('Request body check email uniqueness: ', req.body);
       
       if (req.body && req.body.email) {
-        console.log('req.body && req.body.email');
 
         const sql = 'SELECT * FROM Users WHERE email = ?';
         const values = [req.body.email];
@@ -163,27 +151,21 @@ export class UsersController {
         try {
           const [results, fields] = await mySqlPool.execute(sql, values);
 
-          console.log('results: ', results);
-          console.log('fields: ', fields);
-
           if (Array.isArray(results) && results.length === 0) { // if email is unique
             next();
           }
           else {
-            return res.status(409).send('Email already exists');
+            return res.status(409).send('An account with this email address already exists.');
           }  
         }
         catch(err) {
           console.error('error executing SQL: ', err);
-          return res.status(500).send(err);
+          return res.status(500).send('Database error');
         }
       }
       else {
         console.error('email is required');
-        return res.status(400).json({
-          error: 'email is required',
-          receivedKeys: Object.keys(req.body ?? {}),
-        });
+        return res.status(400).send('Error processing form');
       }
     }
   }
@@ -191,18 +173,13 @@ export class UsersController {
   static setUserVerified(mySqlPool: Pool): any {
       
     return async (req: any, res: any, next: any) => {
-      console.log('Request body setUserVerified: ', req.body);
       if (req.body && req.body.email) {
-        console.log('req.body && req.body.email');
 
         const sql = 'UPDATE Users SET verified=true WHERE email = ?';
         const values = [req.body.email];
 
         try {
           const [results, fields]: [any, any] = await mySqlPool.execute(sql, values);
-
-          console.log('results: ', results);
-          console.log('fields: ', fields);
 
           if (results && results.affectedRows === 1) { // if successful update
             return res.send({ message: 'User record updated' });
@@ -213,15 +190,12 @@ export class UsersController {
         }
         catch(err) {
           console.error('error executing SQL: ', err);
-          return res.status(500).send(err);
+          return res.status(500).send('Database error');
         }
       }
       else {
         console.error('email is required');
-        return res.status(400).json({
-          error: 'email is required',
-          receivedKeys: Object.keys(req.body ?? {}),
-        });
+        return res.status(400).send('Error processing form');
       }
     }
   }

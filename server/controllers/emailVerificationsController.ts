@@ -32,24 +32,19 @@ export class EmailVerificationsController {
     let otpHash: string = '';
   
     return (req: any, res: any, next: any) => {
-      console.log('Request body creating email verification: ', req.body);
       
       if (req.body && req.body.email) {
-        console.log('req.body.email: ', req.body.email);
 
         const otp: string = generateOtp();
-        console.log('Generated OTP: ', otp);
   
         bcrypt.hash(otp, Number(process.env.SALT_ROUNDS), async function(err, hash) {
           if (err) {
-            console.log('Error hashing OTP: ', err);
-            return res.status(500).send('Error hashing OTP');
+            console.error('Error hashing OTP: ', err);
+            return res.status(500).send('Error generating verification code.');
           }
           else {
             otpHash = hash;
-            console.log('OTP hash: ', otpHash);
-            console.log('OTP hash length: ', otpHash.length);
-
+            
             try {
               const emailVerification = new EmailVerification(
                 req.body.email,
@@ -69,18 +64,17 @@ export class EmailVerificationsController {
                 try {
                   const [results, fields] = await mySqlPool.execute(sql, values);
         
-                  console.log('results: ', results);
-                  console.log('fields: ', fields);
-                  
                   req.otp = otp;  
                   next();
                 }  
                 catch(err) {
-                  return res.status(500).send(err);
+                  console.error('err: ', err);
+                  return res.status(500).send('Database error');
                 }
             }      
             catch(err) {
               if (err instanceof z.ZodError) {
+                console.error('err.issues: ', err.issues);
                 return res.status(400).send(err.issues);
               }
               else {
@@ -99,7 +93,6 @@ export class EmailVerificationsController {
     let expiresAt: Date;
 
     return async (req: any, res: any, next:any) => {
-      console.log('Request body verify email: ', req.body);
 
       if (req.body && req.body.email && req.body.otp) {
         const sql = 'SELECT verification_code_hash, expires_at FROM EmailVerifications WHERE email = ?';
@@ -110,9 +103,6 @@ export class EmailVerificationsController {
   
           try {
             const [results, fields] = await mySqlPool.execute(sql, values);
-  
-            console.log('results: ', results);
-            console.log('fields: ', fields);
   
             if (Array.isArray(results) && results.length > 0) {
               const resultsObj: any = results[0];
@@ -125,13 +115,11 @@ export class EmailVerificationsController {
 
               bcrypt.compare(req.body.otp, storedOtpHash, (err, result) => {
                 if (err) {
-                  console.log('Error verifyingg OTP', err);
+                  console.error('Error verifying OTP', err);
                   return res.status(500).send('Error verifying code');
                 }
                 else {
-                  console.log('result: ', result);
                   if (result) {
-                    console.log('OTP verified');
                     next();
                   }
                   else {
@@ -145,7 +133,8 @@ export class EmailVerificationsController {
             }
           }   
           catch(err) {
-            return res.status(500).send(err);
+            console.error('err: ', err);
+            return res.status(500).send('Error verifying email');
           }    
       }
     }

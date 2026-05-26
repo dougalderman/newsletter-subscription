@@ -41,8 +41,6 @@ export default function EmailVerification() {
       ? (location.state as { email: string }).email
       : '';
 
-  console.log('email: ', email);
-
   const verifyMutation = useVerifyEmail();
 
   const form = useForm<EmailVerificationFrontEndType>({
@@ -55,8 +53,6 @@ export default function EmailVerification() {
   });
 
   React.useEffect(() => {
-    console.log('in useEffect()');
-    console.log('email: ', email);
     if (!email) {
       navigate('/signup', { replace: true });
       return;
@@ -71,7 +67,6 @@ export default function EmailVerification() {
   const { isSubmitting, isDirty } = form.formState;
   
   const onSubmit = form.handleSubmit(async (values: EmailVerificationFrontEndType) => {
-    console.log('in onSubmit');
     const payload: EmailVerificationFrontEndType = {
       email: values.email,
       otp: values.otp
@@ -79,7 +74,6 @@ export default function EmailVerification() {
 
     const parsed = EmailVerificationFrontEndSchema.safeParse(payload);
     if (!parsed.success) {
-      console.log('parsing error');
       parsed.error.issues.forEach((issue: any) => {
         const field = issue.path[0] as keyof EmailVerificationFrontEndType | undefined;
         if (field) {
@@ -90,15 +84,17 @@ export default function EmailVerification() {
     }
 
     try {
-      console.log('before await verifyMutation');
       await verifyMutation.mutateAsync(parsed.data);
-      console.log('after await verifyMutation');
     } catch (error: any) {
-      console.log('error: ', error);
       let err: string = '';
-      if (error.response && error.response.data) {
-        console.log('error.response: ', error.response);
-        err = error.response.data.message;
+      if (error && error.response && error.response.data) {
+        console.error('error.response: ', error.response);
+        if (error.response.data.message) {
+          err = error.response.data.message;
+        }
+        else {
+          err = error.response.data;
+        }
       }
       form.setError('root', {
         type: 'manual',
