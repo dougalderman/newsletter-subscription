@@ -24,7 +24,7 @@ After email is verified by being entered in a form, the screen will display a me
 
 ![Email verification form success message](readme_images/Email_Verification_Successful.jpg)
 
-This is a React/Typerscript app with Axios/TanStack Query for http calls, Zod for back and front end schema, React Hook Form and Shadcn/UI for the signup and email verification forms, React Router/Vite for package builder, Node/Express for sever, Nodemailer for the email verification, bcrypt for encrypting OTP codes, and a MySQL database to store the form information. There are two routes: signup & email-verification. Signup is the default route.
+This is a React/Typerscript app with Axios/TanStack Query for http calls, Zod for back and front end schema, React Hook Form and Shadcn/UI for the signup and email verification forms, React Router/Vite for package builder, Node/Express for sever, Nodemailer for sending emails, bcrypt for encrypting OTP codes, and a MySQL database to store the form information. There are two routes: signup & email-verification. Signup is the default route.
 
 Technologies used:
 React, TypeScript, Lodash, Axios, TanStack Query, Zod/React Hook Form, React Router/Vite, Shadcn/UI,  Node.js, Express, MySQL.
