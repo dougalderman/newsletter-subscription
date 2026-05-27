@@ -18,11 +18,11 @@ The signup form hase fields for first name, last name, email, password, confirm 
 
 Phone number and street address2 aren’t required. Hitting the submit button on this page will trigger the server to make sure the email is not already in database. If the email is unique, the user record will be added to the database with the verified field set to false. There will be an email verification involving sending a verification code. 
 
-[Email verification form](readme_images/Email_Verification_Form.jpg)
+![Email verification form](readme_images/Email_Verification_Form.jpg)
 
 After email is verified by being entered in a form, the screen will display a message saying that the user has been successfully added as a subscriber (ignoring payments). The verified field will be set to true.
 
-[Email verification form success message](readme_images/Email_Verification_Successful.jpg)
+![Email verification form success message](readme_images/Email_Verification_Successful.jpg)
 
 This is a React/Typerscript app with Axios/TanStack Query for http calls, Zod for back and front end schema, React Hook Form and Shadcn/UI for the signup and email verification forms, React Router/Vite for package builder, Node/Express for sever, Nodemailer for the email verification, bcrypt for encrypting OTP codes, and a MySQL database to store the form information. There are two routes: signup & email-verification. Signup is the default route.
 
