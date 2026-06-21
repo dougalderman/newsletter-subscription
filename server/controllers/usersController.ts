@@ -145,12 +145,13 @@ export class UsersController {
       
       if (req.body && req.body.email) {
 
-        const sql = 'SELECT * FROM Users WHERE email = ?';
+        const sql = 'SELECT id FROM Users WHERE email = ?';
         const values = [req.body.email];
 
         try {
-          const [results, fields] = await mySqlPool.execute(sql, values);
+          const [results] = await mySqlPool.execute(sql, values);
 
+          console.log('checkEmailUniqueness results: ', results);
           if (Array.isArray(results) && results.length === 0) { // if email is unique
             next();
           }

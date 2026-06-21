@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { signup, verifyEmail, getAnalytics, login } from '../services/usersService';
+import { setAccessToken } from '../services/authStore';
 
 // Hook for signing up a new user (Create)
 export const useSignup = () => {
@@ -25,19 +26,19 @@ export const useAnalytics = () => {
   });
 };
 
-// Hook for logging in (Read)
+// Hook for logging in
 export const useLogin = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: login
-  }
-onSuccess: (data) => {
-    // Save token directly into your runtime memory variable.
-    setAccessToken(data.token);
+    mutationFn: login,
     
-    // Wipe old cache and trigger fetch for the new user's profile
-    queryClient.invalidateQueries({ queryKey: ['userProfile'] });
-  },
-});
+    onSuccess: (data: any) => {
+      // Save token directly into your runtime memory variable.
+      setAccessToken(data.token);
+      
+      // Wipe old cache and trigger fetch for the new user's profile
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    },
+  });
 }

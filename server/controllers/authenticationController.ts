@@ -3,8 +3,10 @@ import jwt from 'jsonwebtoken';
 export class AuthenticationController {
 
   static signToken: any = (req: any, res: any, next: any) => {
-    const { body } = req;
-    const { email, adminAuthorized } = body;
+    console.log('signToken');
+    const { user } = req;
+    console.log('user: ', req.user);
+    const { email, adminAuthorized } = user;
 
     jwt.sign(
       { email, adminAuthorized }, process.env.JWT_TOKEN_SECRET as string, (err: any, token: any) => {
@@ -13,7 +15,7 @@ export class AuthenticationController {
           return res.status(500).send('Error signing token');
         }
         else {
-          res.json({ token });
+          res.json({ token, adminAuthorized });
         }
       });
   }  

@@ -1,9 +1,9 @@
-// import { UsersController } from './usersController';
 import type { Pool } from 'mysql2/promise';
 import type { Transporter } from 'nodemailer';
 import { UsersController } from './usersController';
 import { EmailVerificationsController } from './emailVerificationsController';
 import { SendEmailController } from './sendEmailController';
+import { AdminController } from './adminController';
 import { LoginController } from './loginController';
 import { AuthenticationController } from './authenticationController';
 
@@ -25,7 +25,9 @@ export class EndpointsController {
     app.post('/api/verify-email', EmailVerificationsController.verifyEmail(mySqlPool), UsersController.setUserVerified(mySqlPool));
     
     // Logs user in.
-    app.post('/api/login', LoginController.loginUser(mySqlPool), AuthenticationController.signToken); // Logs in user.
+    app.post('/api/login', LoginController.loginUser(mySqlPool), AuthenticationController.signToken); 
 
+     // Gets analytics data if user is authorized.
+    app.get('/api/analytics', AuthenticationController.authenticateToken, AdminController.getData(mySqlPool), );
   } 
 }
