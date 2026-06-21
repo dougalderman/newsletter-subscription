@@ -63,7 +63,7 @@ export class EmailVerificationsController {
                 ]
         
                 try {
-                  const [results, fields] = await mySqlPool.execute(sql, values);
+                  await mySqlPool.execute(sql, values);
         
                   req.otp = otp;  
                   next();
@@ -85,6 +85,10 @@ export class EmailVerificationsController {
           }
         });
       }
+      else {
+        console.error('Email not received in request body');
+        return res.status(400).send('Error processing form');
+      }    
     }
   }      
   
@@ -103,7 +107,7 @@ export class EmailVerificationsController {
           ]
   
           try {
-            const [results, fields] = await mySqlPool.execute(sql, values);
+            const [results] = await mySqlPool.execute(sql, values);
   
             if (Array.isArray(results) && results.length > 0) {
               const resultsObj: any = results[0];
@@ -138,6 +142,10 @@ export class EmailVerificationsController {
             return res.status(500).send('Error verifying email');
           }    
       }
+      else {
+        console.error('Email or otp not received in request body');
+        return res.status(400).send('Error processing form');
+      }    
     }
   }    
 }   
