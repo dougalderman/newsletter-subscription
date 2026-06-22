@@ -9,6 +9,7 @@
     "typecheck": "react-router typegen && tsc -b"
   },
   "dependencies": {
+    "@observablehq/plot": "^0.6.17",
     "@react-router/express": "7.15.0",
     "@react-router/node": "7.15.0",
     "bcrypt": "^6.0.0",

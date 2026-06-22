@@ -1,42 +1,69 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { useMemo, useState, useEffect } from 'react';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
+import { PlotFigure } from '../components/plot/plot-figure';
 import { useAnalytics } from '../hooks/useUsers';
+import * as charts from '../lib/analyticsCharts';
 
 export default function AdminPage() {
 
-  const navigate = useNavigate();
-  const analyticsQuery = useAnalytics();
+  const { data, isLoading, isError } = useAnalytics();
+  // const [ centroids, setCentroids ] = useState<charts.CountyCentroid[] | null>(null);
 
-  useEffect(() => {
-    // 🚀 Code here runs automatically on page startup
-    console.log("The component has loaded!");
-    
-    // Example: Trigger an API call
-    fetchData(); 
-    }, []); // 👈 Empty array ensures this runs ONLY ONCE on mount
+  /* useEffect(() => {
+    fetch('/data/us-county-centroids.json')
+      .then((response) => response.json())
+      .then(setCentroids);
+  }, []); */
+ 
+  const signupsLineOptions = useMemo(
+    () => (data ? charts.buildSignupsLineOptions(data) : null),
+    [data]
+  );
 
-  const fetchData = async () => {
-    try {
-      const result = await analyticsQuery.refetch();
-      console.log('Analytics data: ', result);
-      if (result && result.data) {
-        // TODO - Render analytics data in the UI instead of just logging it.
-        console.log('result && result.data');
-      }
-      else {
-        console.error('No data returned from analytics query');
-      };
-    } catch (error: any) {
-      if (error && error.response && error.response.data) {
-        console.error('error.response: ', error.response);
-      }
-    }
-  }
+  const amountsLineOptions = useMemo(
+    () => (data ? charts.buildAmountsLineOptions(data) : null),
+    [data]
+  );
+
+  const subscriptionHistogramOptions = useMemo(
+    () => (data ? charts.buildSubscriptionHistogramOptions(data) : null),
+    [data]
+  );
+
+  /* const countyBubbleMapOptions = useMemo(
+    () => (data ? charts.buildCountyBubbleMapOptions(data, centroids) : null),
+    [data]
+  ); */
+
+  if (isLoading) return <p>Loading analytics...</p>;
+  if (isError || !data) return <p>Error loading analytics.</p>;
+  
   return (
-      <main>
-        <h1>Admin</h1>
-        <p>Admin-only analytics page.</p>
+      <main className="container mx-auto p-6 space-y-8">
+        <Card>
+          <CardHeader><CardTitle>Signups over time</CardTitle></CardHeader>
+          <CardContent>
+            {signupsLineOptions && <PlotFigure options={signupsLineOptions} className="w-full overflow-x-auto" />}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader><CardTitle>Amounts over time</CardTitle></CardHeader>
+          <CardContent>
+            {amountsLineOptions && <PlotFigure options={amountsLineOptions} className="w-full overflow-x-auto" />}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader><CardTitle>Subscription Levels</CardTitle></CardHeader>
+          <CardContent>
+            {subscriptionHistogramOptions && <PlotFigure options={subscriptionHistogramOptions} className="w-full overflow-x-auto" />}
+          </CardContent>
+        </Card>
       </main>
     );
 }  
