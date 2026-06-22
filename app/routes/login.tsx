@@ -60,8 +60,7 @@ export default function Login() {
 
     try {
       const result = await loginMutation.mutateAsync(parsed.data);
-      console.log('result: ', result);
-      if (result && result.data && result.data.adminAuthorized) {
+      if (result?.adminAuthorized) {
         navigate('/admin');
       }
       else {

@@ -23,8 +23,6 @@ export class LoginController {
   
             if (Array.isArray(results) && results.length > 0) {
               const resultsObj: any = results[0];
-              console.log('loginController');
-              console.log('resultsObj: ', resultsObj);
               storedPasswordHash = String(resultsObj.password_hash);
               adminAuthorized = Boolean(resultsObj.admin_authorized);
 

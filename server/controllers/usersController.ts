@@ -151,7 +151,6 @@ export class UsersController {
         try {
           const [results] = await mySqlPool.execute(sql, values);
 
-          console.log('checkEmailUniqueness results: ', results);
           if (Array.isArray(results) && results.length === 0) { // if email is unique
             next();
           }

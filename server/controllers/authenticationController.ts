@@ -3,9 +3,7 @@ import jwt from 'jsonwebtoken';
 export class AuthenticationController {
 
   static signToken: any = (req: any, res: any, next: any) => {
-    console.log('signToken');
     const { user } = req;
-    console.log('user: ', req.user);
     const { email, adminAuthorized } = user;
 
     jwt.sign(

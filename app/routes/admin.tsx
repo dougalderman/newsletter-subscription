@@ -21,29 +21,22 @@ export default function AdminPage() {
       const result = await analyticsQuery.refetch();
       console.log('Analytics data: ', result);
       if (result && result.data) {
+        // TODO - Render analytics data in the UI instead of just logging it.
         console.log('result && result.data');
       }
       else {
-        navigate('/login');
+        console.error('No data returned from analytics query');
       };
     } catch (error: any) {
-      let err: string = '';
       if (error && error.response && error.response.data) {
         console.error('error.response: ', error.response);
-        if (error.response.data.message) {
-          err = error.response.data.message;
-        }
-        else {
-          err = error.response.data;
-        }
       }
     }
-
-    return (
+  }
+  return (
       <main>
         <h1>Admin</h1>
         <p>Admin-only analytics page.</p>
       </main>
     );
-  }
 }  
