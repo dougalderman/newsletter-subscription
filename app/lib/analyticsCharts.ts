@@ -154,25 +154,25 @@ export function buildCountyBubbleMapOptions(
   }
 
   return {
-    width: 900,
-    height: 500,
-    projection: 'albers-usa',
+    width: 975,
+    projection: 'identity',
     marks: [
       Plot.geo(nation, { fill: "#ddd" }),
       Plot.geo(statemesh, { stroke: "white" }),
-      Plot.dot(data, {
-        x: (d) => d.longitude,
-        y: (d) => d.latitude,
-        r: (d) => d.count * 10,
+      Plot.geo(data, {
+        // Transform your row into a GeoJSON geometry object
+        geometry: (d) => ({
+          type: 'Point',
+          coordinates: [d.longitude, d.latitude]
+        }),
+
+        // Turn the geo points into sized bubbles
+        r: (d) => d.count,
         fill: 'count',
         fillOpacity: 0.7,
-        stroke: '#000', 
+        stroke: '#000'
       }),
     ],
-    color: {
-      type: 'linear',
-      scheme: 'reds'
-    },
   };
 }    
 

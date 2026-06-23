@@ -99,7 +99,7 @@ export default function AdminPage() {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle>County Map of Subscriptions</CardTitle></CardHeader>
+          <CardHeader><CardTitle>U.S. County Map of Subscriptions</CardTitle></CardHeader>
           <CardContent>
             {countyBubbleMapOptions && <PlotFigure options={countyBubbleMapOptions} className="w-full overflow-x-auto" />}
           </CardContent>
