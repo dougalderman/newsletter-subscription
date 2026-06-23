@@ -82,7 +82,7 @@ export function buildSubscriptionHistogramOptions(rows: UserRow[]): Plot.PlotOpt
   };
 }
 
-/* type CountyCount = { county: string, state: string, count: number };
+type CountyCount = { county: string, state: string, count: number };
 export type CountyCentroid = CountyCount & { latitude: number; longitude: number };
 
 function aggregateByCounty(rows: UserRow[]): CountyCount[] {
@@ -102,16 +102,12 @@ function aggregateByCounty(rows: UserRow[]): CountyCount[] {
 
 export function buildCountyBubbleMapOptions(
   rows: UserRow[],
-  centroids: CountyCentroid[] | null
+  centroids: any
 ): Plot.PlotOptions {
   const counts = aggregateByCounty(rows);
   const data = counts
     .map((c) => {
-      const centroid = centroids?.find(
-        (g) =>
-          g.county.toLowerCase() === c.county.toLowerCase() &&
-          g.state.toLowerCase() === c.state.toLowerCase()
-      );
+      const centroid = centroids[c.state.toUpperCase()].counties[c.county];
       return centroid ? { ...c, ...centroid } : null;  
     })
     .filter(Boolean) as CountyCentroid[];
@@ -134,6 +130,6 @@ export function buildCountyBubbleMapOptions(
     ],
     color: { legend: true, label: 'Subscribers' },
   };
-} */     
+}    
 
         

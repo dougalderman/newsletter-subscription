@@ -13,13 +13,13 @@ import * as charts from '../lib/analyticsCharts';
 export default function AdminPage() {
 
   const { data, isLoading, isError } = useAnalytics();
-  // const [ centroids, setCentroids ] = useState<charts.CountyCentroid[] | null>(null);
+  const [ centroids, setCentroids ] = useState<charts.CountyCentroid[] | null>(null);
 
-  /* useEffect(() => {
+  useEffect(() => {
     fetch('/data/us-county-centroids.json')
       .then((response) => response.json())
       .then(setCentroids);
-  }, []); */
+  }, []);
  
   const signupsLineOptions = useMemo(
     () => (data ? charts.buildSignupsLineOptions(data) : null),
@@ -36,10 +36,10 @@ export default function AdminPage() {
     [data]
   );
 
-  /* const countyBubbleMapOptions = useMemo(
+  const countyBubbleMapOptions = useMemo(
     () => (data ? charts.buildCountyBubbleMapOptions(data, centroids) : null),
     [data]
-  ); */
+  );
 
   if (isLoading) return <p>Loading analytics...</p>;
   if (isError || !data) return <p>Error loading analytics.</p>;
