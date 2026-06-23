@@ -13,14 +13,43 @@ import * as charts from '../lib/analyticsCharts';
 export default function AdminPage() {
 
   const { data, isLoading, isError } = useAnalytics();
-  const [ centroids, setCentroids ] = useState<charts.CountyCentroid[] | null>(null);
+  const [ centroids, setCentroids ] = useState<any>(null);
+  const [ nation, setNation ] = useState<any>(null);
+  const [ statemesh, setStatemesh ] = useState<any>(null);
 
   useEffect(() => {
-    fetch('/data/us-county-centroids.json')
-      .then((response) => response.json())
-      .then(setCentroids);
-  }, []);
- 
+     // Create an AbortController to handle component unmounting / race conditions
+    const controller = new AbortController();
+    
+    const fetchDashboardData = async () => {
+      try {
+        // All three fetches start at the same time
+        const [centroidsRes, nationRes, statemeshRes] = await Promise.all([
+          fetch('/data/us-county-centroids.json', { signal: controller.signal }),
+          fetch('/data/nation.json', { signal: controller.signal }),
+          fetch('/data/statemesh.json', { signal: controller.signal }),
+        ]);
+
+        const centroidsJson = await centroidsRes.json();
+        const nationJson = await nationRes.json();
+        const statemeshJson = await statemeshRes.json();
+
+        setCentroids(centroidsJson);
+        setNation(nationJson);
+        setStatemesh(statemeshJson);
+      } catch (error: any) {
+        if (error.name !== 'AbortError') {
+          console.error("Failed to fetch data", error);
+        }
+      } 
+    };
+
+    fetchDashboardData();
+
+    // Cleanup: aborts requests if user navigates away before they finish
+    return () => controller.abort();
+  }, []); // Empty array runs this once on mount
+  
   const signupsLineOptions = useMemo(
     () => (data ? charts.buildSignupsLineOptions(data) : null),
     [data]
@@ -37,8 +66,13 @@ export default function AdminPage() {
   );
 
   const countyBubbleMapOptions = useMemo(
-    () => (data ? charts.buildCountyBubbleMapOptions(data, centroids) : null),
-    [data]
+    () => (data && centroids && nation && statemesh ? charts.buildCountyBubbleMapOptions(
+      data,
+      centroids,
+      nation,
+      statemesh
+    ) : null),
+    [data, centroids, nation, statemesh]
   );
 
   if (isLoading) return <p>Loading analytics...</p>;
@@ -62,6 +96,12 @@ export default function AdminPage() {
           <CardHeader><CardTitle>Subscription Levels</CardTitle></CardHeader>
           <CardContent>
             {subscriptionHistogramOptions && <PlotFigure options={subscriptionHistogramOptions} className="w-full overflow-x-auto" />}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader><CardTitle>County Map of Subscriptions</CardTitle></CardHeader>
+          <CardContent>
+            {countyBubbleMapOptions && <PlotFigure options={countyBubbleMapOptions} className="w-full overflow-x-auto" />}
           </CardContent>
         </Card>
       </main>

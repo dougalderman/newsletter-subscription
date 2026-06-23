@@ -85,50 +85,94 @@ export function buildSubscriptionHistogramOptions(rows: UserRow[]): Plot.PlotOpt
 type CountyCount = { county: string, state: string, count: number };
 export type CountyCentroid = CountyCount & { latitude: number; longitude: number };
 
+interface County { lat: number; lng: number; }
+interface StateCentroid { counties: Record<string, County>; [k: string]: any }
+
+
 function aggregateByCounty(rows: UserRow[]): CountyCount[] {
   const map = new Map<string, CountyCount>();
   for (const { county, state } of rows) {
+    const countyLC = county.toLowerCase();
+    const stateLC = state.toLowerCase();
     const key = `${county}, ${state}`;
     const existing = map.get(key);
     if (existing) {
       existing.count++;
     } 
     else {
-      map.set(key, { county, state, count: 1 });
+      map.set(key, { county: countyLC, state: stateLC, count: 1 });
     } 
   }
   return [...map.values()];
 }
 
+function aggregateCentroidsByCounty(centroids: any): CountyCentroid[] {
+  if (!centroids) return [];
+
+  let countyCentroid: CountyCentroid[] = [];
+
+  // Convert top-level object to array (typed)
+  const topLevelArray = (Object.entries(centroids as Record<string, StateCentroid>) as [string, StateCentroid][]) .map(([state, value]) => ({
+    state: state.toLowerCase(),
+    ...(value || {})
+  }));
+
+  // Convert country object to array — cast county entries and spread mapped arrays into the result
+  for (const stateObj of topLevelArray) {
+    const entries = Object.entries(stateObj.counties as Record<string, County>) as [string, County][];
+    countyCentroid.push(...entries.map(([county, value]) => ({
+      state: stateObj.state,
+      county: county.toLowerCase(),
+      count: 0,
+      latitude: value.lat,
+      longitude: value.lng
+    })));
+  }
+
+  return countyCentroid;
+}
+
 export function buildCountyBubbleMapOptions(
   rows: UserRow[],
-  centroids: any
+  centroids: any,
+  nation: any,
+  statemesh: any
 ): Plot.PlotOptions {
-  const counts = aggregateByCounty(rows);
-  const data = counts
-    .map((c) => {
-      const centroid = centroids[c.state.toUpperCase()].counties[c.county];
-      return centroid ? { ...c, ...centroid } : null;  
-    })
-    .filter(Boolean) as CountyCentroid[];
+  const counts: CountyCount[] = aggregateByCounty(rows);
+  const countyCentroids: CountyCentroid[] = aggregateCentroidsByCounty(centroids);
+  
+  // Add lat and long from countyCentroids to array elements in counts.
+  let data: CountyCentroid[] = [];
+
+  for (const count of counts) {
+    const centroid: CountyCentroid | undefined = countyCentroids.find(element => 
+      count.state === element.state && count.county === element.county
+    );
+    if (centroid) {
+      data.push(Object.assign({}, centroid, count));
+    }  
+  }
 
   return {
     width: 900,
     height: 500,
-    projection: { type: 'albers-usa' },
+    projection: 'albers-usa',
     marks: [
+      Plot.geo(nation, { fill: "#ddd" }),
+      Plot.geo(statemesh, { stroke: "white" }),
       Plot.dot(data, {
-        x: 'longitude',
-        y: 'latitude',
-        r: 'count',
+        x: (d) => d.longitude,
+        y: (d) => d.latitude,
+        r: (d) => d.count * 10,
         fill: 'count',
         fillOpacity: 0.7,
-        stroke: '#333', 
-        title: (d) => `${d.county}, ${d.state}: ${d.count}`,
+        stroke: '#000', 
       }),
-      Plot.geo({ type: 'Sphere'}, { fill: '#f8fafc', stroke: '#cbd5e1' }),
     ],
-    color: { legend: true, label: 'Subscribers' },
+    color: {
+      type: 'linear',
+      scheme: 'reds'
+    },
   };
 }    
 
