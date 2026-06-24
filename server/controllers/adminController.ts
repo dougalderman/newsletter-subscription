@@ -5,7 +5,7 @@ export class AdminController {
   static getData(mySqlPool: Pool): any {
     return async (req: any, res: any, next: any) => {
       
-      const sql = 'SELECT county, state, subscriber, subscription_level, verified, created_at FROM Users';
+      const sql = 'SELECT county, state, subscription_level, created_at FROM Users WHERE subscriber=true AND verified=true';
       
       try {
         const [results] = await mySqlPool.execute(sql);

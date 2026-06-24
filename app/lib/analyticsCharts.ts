@@ -1,5 +1,5 @@
 import * as Plot from '@observablehq/plot';
-import { geoIdentity } from 'd3-geo';
+import { geoAlbersUsa } from 'd3-geo';
 import { scaleSqrt } from 'd3-scale';
 import { extent } from 'd3-array';
 
@@ -8,8 +8,6 @@ type UserRow = {
   subscription_level: number;
   county: string;
   state: string;
-  subscriber: boolean;
-  verified: boolean;
 }
 
 function signupsByDay(rows: UserRow[]) {
@@ -156,50 +154,44 @@ export function buildCountyBubbleMapOptions(
     }  
   }
   
-  // Use d3 to create a projection that matches the rendered `nation`/`statemesh`
-  // when Plot uses `projection: 'identity'`. geoIdentity().fitSize maps the
-  // geographic coordinates to pixel coordinates for the given width/height.
   const width = 975;
   const height = 610;
 
-  // 1. Configure geoIdentity to map geographic [lon, lat] to the pre-projected layout
-  // The U.S. bounding box below roughly matches the bounds of the 975x610 TopoJSON 
-  const usGeographicBounds: any = {
-    type: "Polygon",
-    coordinates: [[
-      [-117.2, 32.7], // Southwest
-      [-80.2, 25.8],  // Southeast
-      [-67.0, 44.8],  // Northeast
-      [-124.6, 48.4], // Northwest
-      [-117.2, 32.7]  // Close polygon
-    ]]
-  };
+  // 1. Initialize the Albers USA projection.
+  // The standard US TopoJSON map is pre-projected to fit exactly 975x610 dimensions.
+  const projection = geoAlbersUsa()
+    .scale(1300)
+    .translate([width / 2, height / 2]);
 
-  const projection = geoIdentity()
-    .reflectY(true) // Inverts the Y-axix because SVG pixels count down while latitude counts up.
-    .fitSize([width, height], usGeographicBounds);
-
-  // scale bubble radii using a sqrt scale so area corresponds to value
+  // 2. scale bubble radii using a sqrt scale
   const values = data.map((d) => d.count);
   const rScale = scaleSqrt()
     .domain(extent(values) as [number, number])
-    .range([1, 24]);
+    .range([2, 24]); // Increased min radius slightly to ensure single counts remain visible.
 
-  // Project the county centroids into pixel coordinates and assign radii
-  const geoPoints = data.map((d) => {
-    // Pass [longitude, latitude] explicitly to the identity transform
-    const [x, y] = projection([d.longitude, d.latitude]) ?? [];
+  // Project the raw geographic [longitude, latitude] into 2D plane.
+  const geoPoints = data.
+    map((d) => {
+    // geoAlbersUsa expects an array of: [longitude, latitude]
+    const coords = projection([d.longitude, d.latitude]);
+    
+    // If coordinates are null, the point is outside the US (e.g. Puerto Rico or bad data). Filter it out.
+    if (!coords) return null;
+    
+    const [x, y] = coords;
+
     return {
       ...d,
       geometry: { type: 'Point', coordinates: [x, y] },
       r: rScale(d.count)
     };
-  });
+  })
+  .filter((d): d is NonNullable<typeof d> => d !== null); // Strip out unprojectable points.
 
   return {
     width,
     height,
-    projection: 'identity', // // Tells Plot to render the points directly using their [x, y] screen values
+    projection: 'identity', // // Tells Plot to use the already computed 2D pixel points.
     marks: [
       Plot.geo(nation, { fill: "#ddd" }),
       Plot.geo(statemesh, { stroke: "white" }),
