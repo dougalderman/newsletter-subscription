@@ -120,7 +120,7 @@ function aggregateCentroidsByCounty(centroids: any): CountyCentroid[] {
     ...(value || {})
   }));
 
-  // Convert country object to array — cast county entries and spread mapped arrays into the result
+  // Convert county object to array — cast county entries and spread mapped arrays into the result
   for (const stateObj of topLevelArray) {
     const entries = Object.entries(stateObj.counties as Record<string, County>) as [string, County][];
     countyCentroid.push(...entries.map(([county, value]) => ({
@@ -155,19 +155,39 @@ export function buildCountyBubbleMapOptions(
       data.push(Object.assign({}, centroid, count));
     }  
   }
+  
   // Use d3 to create a projection that matches the rendered `nation`/`statemesh`
   // when Plot uses `projection: 'identity'`. geoIdentity().fitSize maps the
   // geographic coordinates to pixel coordinates for the given width/height.
   const width = 975;
   const height = 610;
-  const projection = geoIdentity().fitSize([width, height], nation as any);
+
+  // 1. Configure geoIdentity to map geographic [lon, lat] to the pre-projected layout
+  // The U.S. bounding box below roughly matches the bounds of the 975x610 TopoJSON 
+  const usGeographicBounds: any = {
+    type: "Polygon",
+    coordinates: [[
+      [-117.2, 32.7], // Southwest
+      [-80.2, 25.8],  // Southeast
+      [-67.0, 44.8],  // Northeast
+      [-124.6, 48.4], // Northwest
+      [-117.2, 32.7]  // Close polygon
+    ]]
+  };
+
+  const projection = geoIdentity()
+    .reflectY(true) // Inverts the Y-axix because SVG pixels count down while latitude counts up.
+    .fitSize([width, height], usGeographicBounds);
 
   // scale bubble radii using a sqrt scale so area corresponds to value
   const values = data.map((d) => d.count);
-  const rScale = scaleSqrt().domain(extent(values) as [number, number]).range([0, 24]);
+  const rScale = scaleSqrt()
+    .domain(extent(values) as [number, number])
+    .range([1, 24]);
 
   // Project the county centroids into pixel coordinates and assign radii
   const geoPoints = data.map((d) => {
+    // Pass [longitude, latitude] explicitly to the identity transform
     const [x, y] = projection([d.longitude, d.latitude]) ?? [];
     return {
       ...d,
@@ -179,7 +199,7 @@ export function buildCountyBubbleMapOptions(
   return {
     width,
     height,
-    projection: 'identity',
+    projection: 'identity', // // Tells Plot to render the points directly using their [x, y] screen values
     marks: [
       Plot.geo(nation, { fill: "#ddd" }),
       Plot.geo(statemesh, { stroke: "white" }),
