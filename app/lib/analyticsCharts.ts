@@ -10,30 +10,37 @@ type UserRow = {
   state: string;
 }
 
-function signupsByDay(rows: UserRow[]) {
-  const counts = new Map<string, number>();
+function cumulativeSignupsByDay(rows: UserRow[]) {
+  let runningSignupTotal: number = 0;
+  const signups = new Map<string, number>();
+  
   for (const row of rows) {
     const day = row.created_at.split('T')[0]; // YYYY-MM-DD
-    counts.set(day, (counts.get(day) ?? 0) + 1);
+    runningSignupTotal += 1;
+    signups.set(day, runningSignupTotal);
   }
-  return [...counts.entries()]
+  
+  return [...signups.entries()]
     .map(([day, count]) => ({ date: new Date(day), count }))
     .sort((a, b) => +a.date - +b.date);
 }
 
-function amountsByDay(rows: UserRow[]) {
+function cumulativeAmountsByDay(rows: UserRow[]) {
+  let runningAmountTotal: number = 0;
   const amounts = new Map<string, number>();
+  
   for (const row of rows) {
     const day = row.created_at.split('T')[0]; // YYYY-MM-DD
-    amounts.set(day, (amounts.get(day) ?? 0) + row.subscription_level);
+    runningAmountTotal += row.subscription_level
+    amounts.set(day, runningAmountTotal);
   }
   return [...amounts.entries()]
     .map(([day, amount]) => ({ date: new Date(day), amount }))
     .sort((a, b) => +a.date - +b.date);
 }
 
-export function buildSignupsLineOptions(rows: UserRow[]): Plot.PlotOptions {
-  const data = signupsByDay(rows);
+export function buildSignupsAreaOptions(rows: UserRow[]): Plot.PlotOptions {
+  const data = cumulativeSignupsByDay(rows);
   return {
     width: 640,
     height: 320,
@@ -42,14 +49,13 @@ export function buildSignupsLineOptions(rows: UserRow[]): Plot.PlotOptions {
     y: { grid: true, label: 'Signups' },
     color: { scheme: 'blues'},
     marks: [
-      Plot.lineY(data, { x: 'date', y: 'count', stroke: 'steelblue', strokeWidth: 2 }),
-      Plot.dot(data, { x: 'date', y: 'count', fill: 'steelblue', r: 3 }),
+      Plot.areaY(data, { x: 'date', y: 'count', fill: 'steelblue' } ),
     ],
   };
 }
 
-export function buildAmountsLineOptions(rows: UserRow[]): Plot.PlotOptions {
-  const data = amountsByDay(rows);
+export function buildAmountsAreaOptions(rows: UserRow[]): Plot.PlotOptions {
+  const data = cumulativeAmountsByDay(rows);
   return {
     width: 640,
     height: 320,
@@ -58,8 +64,7 @@ export function buildAmountsLineOptions(rows: UserRow[]): Plot.PlotOptions {
     y: { grid: true, label: 'Amount (USD)' },
     color: { scheme: 'greens'},
     marks: [
-      Plot.lineY(data, { x: 'date', y: 'amount', stroke: 'green', strokeWidth: 2 }),
-      Plot.dot(data, { x: 'date', y: 'amount', fill: 'green', r: 3 }),
+      Plot.areaY(data, { x: 'date', y: 'amount', fill: 'green' }),
     ],
   };
 }
@@ -198,6 +203,7 @@ export function buildCountyBubbleMapOptions(
       Plot.geo(geoPoints, {
         geometry: (d: any) => d.geometry,
         r: (d: any) => d.r,
+        title: (d: any) => `state: ${d.state}, county: ${d.county}--${d.count} subscriber${d.count === 1 ? '' : 's'}`,
         fill: 'brown',
         fillOpacity: 0.5,
         stroke: '#fff',

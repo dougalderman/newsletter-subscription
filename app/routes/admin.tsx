@@ -51,12 +51,12 @@ export default function AdminPage() {
   }, []); // Empty array runs this once on mount
   
   const signupsLineOptions = useMemo(
-    () => (data ? charts.buildSignupsLineOptions(data) : null),
+    () => (data ? charts.buildSignupsAreaOptions(data) : null),
     [data]
   );
 
   const amountsLineOptions = useMemo(
-    () => (data ? charts.buildAmountsLineOptions(data) : null),
+    () => (data ? charts.buildAmountsAreaOptions(data) : null),
     [data]
   );
 
