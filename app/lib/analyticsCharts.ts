@@ -1,4 +1,7 @@
 import * as Plot from '@observablehq/plot';
+import { geoIdentity } from 'd3-geo';
+import { scaleSqrt } from 'd3-scale';
+import { extent } from 'd3-array';
 
 type UserRow = {
   created_at: string;
@@ -152,25 +155,41 @@ export function buildCountyBubbleMapOptions(
       data.push(Object.assign({}, centroid, count));
     }  
   }
+  // Use d3 to create a projection that matches the rendered `nation`/`statemesh`
+  // when Plot uses `projection: 'identity'`. geoIdentity().fitSize maps the
+  // geographic coordinates to pixel coordinates for the given width/height.
+  const width = 975;
+  const height = 610;
+  const projection = geoIdentity().fitSize([width, height], nation as any);
+
+  // scale bubble radii using a sqrt scale so area corresponds to value
+  const values = data.map((d) => d.count);
+  const rScale = scaleSqrt().domain(extent(values) as [number, number]).range([0, 24]);
+
+  // Project the county centroids into pixel coordinates and assign radii
+  const geoPoints = data.map((d) => {
+    const [x, y] = projection([d.longitude, d.latitude]) ?? [];
+    return {
+      ...d,
+      geometry: { type: 'Point', coordinates: [x, y] },
+      r: rScale(d.count)
+    };
+  });
 
   return {
-    width: 975,
+    width,
+    height,
     projection: 'identity',
     marks: [
       Plot.geo(nation, { fill: "#ddd" }),
       Plot.geo(statemesh, { stroke: "white" }),
-      Plot.geo(data, {
-        // Transform your row into a GeoJSON geometry object
-        geometry: (d) => ({
-          type: 'Point',
-          coordinates: [d.longitude, d.latitude]
-        }),
-
-        // Turn the geo points into sized bubbles
-        r: (d) => d.count,
-        fill: 'count',
-        fillOpacity: 0.7,
-        stroke: '#000'
+      Plot.geo(geoPoints, {
+        geometry: (d: any) => d.geometry,
+        r: (d: any) => d.r,
+        fill: 'brown',
+        fillOpacity: 0.5,
+        stroke: '#fff',
+        strokeOpacity: 0.5
       }),
     ],
   };
