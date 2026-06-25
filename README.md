@@ -29,12 +29,9 @@ SMTP_SEND_FROM=
 SALT_ROUNDS=
 JWT_TOKEN_SECRET=
 ```
-DEVELOPMENT SCRIPT:
-npm run dev
+DEVELOPMENT SCRIPT: npm run dev
 
-PRODUCTION SCRIPTS:
-npm run build
-npm run start
+PRODUCTION SCRIPTS: npm run build, npm run start
 
 ## Signup Form
 
