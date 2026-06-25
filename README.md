@@ -2,6 +2,39 @@
 
 A newsletter subscription form for U.S.-based subscribers, with different subscription levels and email verification, and an analytics page. It uses React v19, Node.js v24, and MySQL v8.
 
+##Getting Started
+
+###Prerequisites
+System with Node.js v24+, npm v11+, MySQL v8+ database installed.
+
+###Installation
+1. git clone https://github.com/dougalderman/newsletter-subscription.git
+2. npm install
+3. Run db/create_database.sql script to create DB tables.
+4. Create a .env file in the project root folder with the following format:
+PORT=
+NODE_ENV=
+MYSQLHOST=
+MYSQLPORT=
+MYSQLDATABASE=
+MYSQLUSER=
+MYSQLPASSWORD=
+SMTP_HOST=
+SMTP_PORT=
+SMTP_SECURE=
+SMTP_USERNAME=
+SMTP_PASSWORD=
+SMTP_SEND_FROM=
+SALT_ROUNDS=
+JWT_TOKEN_SECRET=
+
+DEVELOPMENT SCRIPT:
+npm run dev
+
+PRODUCTION SCRIPTS:
+npm run build
+npm run start
+
 ## Signup Form
 
 The signup form has fields for first name, last name, email, password, confirm password, phone number, street address1, street address2, state, county, zip code, and a selection of different subscription levels. Here are the levels:
@@ -68,4 +101,3 @@ React, TypeScript, Lodash, Axios, TanStack Query, Observable Plot, D3, Zod/React
 
 AI's used in development:
 Cursor, Copilot, Google AI
-
