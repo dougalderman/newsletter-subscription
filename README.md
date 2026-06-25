@@ -2,9 +2,7 @@
 
 A newsletter subscription form for U.S.-based subscribers, with different subscription levels and email verification, and an analytics page. It uses React v19, Node.js v24, and MySQL v8.
 
-## Requirements
-
-### Signup Form
+## Signup Form
 
 The signup form has fields for first name, last name, email, password, confirm password, phone number, street address1, street address2, state, county, zip code, and a selection of different subscription levels. Here are the levels:
 
@@ -20,7 +18,7 @@ The signup form has fields for first name, last name, email, password, confirm p
 
 Phone number and street address2 aren’t required. Hitting the submit button on this page triggers the server to make sure the email is not already in database. If the email is unique, the user record is added to the database with the verified field set to false.
 
-### Email Verification Form
+## Email Verification Form
 
 There is an email verification involving sending a verification code. 
 
@@ -30,7 +28,7 @@ After email is verified by being entered in a form, the screen displays a messag
 
 ![Email verification form success message](readme_images/Email_Verification_Successful.jpg)
 
-### Admin Feature with Analytics
+## Admin Feature with Analytics
 There is an admin feature with Analytics that is restricted to users with the "admin_authorized" database field set to true. Manually navigating to /admin triggers a nested route:
 ```typescript
 route('/admin', 'routes/require-admin.tsx', [
