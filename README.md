@@ -12,6 +12,7 @@ System with Node.js v24+, npm v11+, MySQL v8+ database installed.
 2. npm install
 3. Run db/create_database.sql script to create DB tables.
 4. Create a .env file in the project root folder with the following format:
+```
 PORT=
 NODE_ENV=
 MYSQLHOST=
@@ -27,7 +28,7 @@ SMTP_PASSWORD=
 SMTP_SEND_FROM=
 SALT_ROUNDS=
 JWT_TOKEN_SECRET=
-
+```
 DEVELOPMENT SCRIPT:
 npm run dev
 
