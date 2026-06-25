@@ -81,13 +81,13 @@ export default function AdminPage() {
   return (
       <main className="container mx-auto p-6 space-y-8">
         <Card>
-          <CardHeader><CardTitle>Signups over time</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Cumulative Signups</CardTitle></CardHeader>
           <CardContent>
             {signupsLineOptions && <PlotFigure options={signupsLineOptions} className="w-full overflow-x-auto" />}
           </CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle>Amounts over time</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Cumulative Amounts</CardTitle></CardHeader>
           <CardContent>
             {amountsLineOptions && <PlotFigure options={amountsLineOptions} className="w-full overflow-x-auto" />}
           </CardContent>
