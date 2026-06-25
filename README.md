@@ -2,12 +2,12 @@
 
 A newsletter subscription form for U.S.-based subscribers, with different subscription levels and email verification, and an analytics page. It uses React v19, Node.js v24, and MySQL v8.
 
-##Getting Started
+## Getting Started
 
-###Prerequisites
+### Prerequisites
 System with Node.js v24+, npm v11+, MySQL v8+ database installed.
 
-###Installation
+### Installation
 1. git clone https://github.com/dougalderman/newsletter-subscription.git
 2. npm install
 3. Run db/create_database.sql script to create DB tables.
