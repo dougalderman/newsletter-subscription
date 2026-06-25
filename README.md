@@ -94,8 +94,11 @@ All charts use Observable Plot, and the bubble map also uses D3.
 
 This is a React/Typerscript app with Axios/TanStack Query for http calls, Zod for back and front end schema, React Hook Form and Shadcn/UI for the signup and email verification forms, React Router/Vite for package builder, Node/Express for server, Nodemailer for sending emails, bcrypt for encrypting passwords & OTP codes, JWT for handling login authentication, and a MySQL database to store the form information to and perform queries for the analytics. There are 4 routes: signup, email-verification, admin, and login. Signup is the default route.
 
-Technologies used:
+## Technologies used
 React, TypeScript, Lodash, Axios, TanStack Query, Observable Plot, D3, Zod/React Hook Form, React Router/Vite, Shadcn/UI,  Node.js, Express, JWT, MySQL.
 
-AI's used in development:
+## AI's used in development
 Cursor, Copilot, Google AI
+
+## License
+This code is open source under the MIT license. See LICENSE in the project root folder.
