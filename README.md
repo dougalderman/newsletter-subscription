@@ -37,7 +37,7 @@ route('/admin', 'routes/require-admin.tsx', [
     index('routes/admin.tsx')
   ]),
   ```
-The parent route require-admin.tsx calls useSyncExternalStore() to execute methods from /services/authStore.ts to confirm authentication using local boolean variable adminAuthorized. If not authorized, require-admin.tsc redirects the user to a login page
+The parent route require-admin.tsx calls useSyncExternalStore() to execute methods from /services/authStore.ts to confirm authentication using local boolean variable adminAuthorized. If not authorized, require-admin.tsx redirects the user to a login page
 
 ![Login Page](readme_images/Login_Page.jpg)
 
