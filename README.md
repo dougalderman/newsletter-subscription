@@ -78,9 +78,9 @@ The admin page admin.tsx hits an api/analytics endpoint for a database query and
 
 ![Cumulative Signups](readme_images/Cumulative_Signups.jpg)
 
-2) Cumulative Amounts Area Chart
+2) Cumulative Amount Area Chart
 
-![Cumulative Amounts](readme_images/Cumulative_Amounts.jpg)
+![Cumulative Amount](readme_images/Cumulative_Amount.jpg)
 
 3) Subscription Levels Histogram
 

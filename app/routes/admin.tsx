@@ -55,8 +55,8 @@ export default function AdminPage() {
     [data]
   );
 
-  const amountsLineOptions = useMemo(
-    () => (data ? charts.buildAmountsAreaOptions(data) : null),
+  const amountLineOptions = useMemo(
+    () => (data ? charts.buildAmountAreaOptions(data) : null),
     [data]
   );
 
@@ -87,9 +87,9 @@ export default function AdminPage() {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle>Cumulative Amounts</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Cumulative Amount</CardTitle></CardHeader>
           <CardContent>
-            {amountsLineOptions && <PlotFigure options={amountsLineOptions} className="w-full overflow-x-auto" />}
+            {amountLineOptions && <PlotFigure options={amountLineOptions} className="w-full overflow-x-auto" />}
           </CardContent>
         </Card>
         <Card>
