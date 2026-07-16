@@ -70,7 +70,7 @@ The parent route require-admin.tsx calls useSyncExternalStore() to execute metho
 
 ![Login Page](readme_images/Login_Page.jpg)
 
-After the user logs in, the server reads the user record and checks for valid password. If password is valid, the JWT token is signed, and the token and adminAuthorized field is sent to the front end. The front end login.tsx navigates to admin.tsx if adminAuthorized is true. If adminAuthorized is not true, or the email or password is invalid, the login screen returns a meaningful error message.
+After the user logs in, the server reads the user record and checks for valid password. If password is valid, the JWT token is signed, and the token and adminAuthorized field are sent to the front end. The front end login.tsx navigates to admin.tsx if adminAuthorized is true. If adminAuthorized is not true, or the email or password is invalid, the login screen returns a meaningful error message.
 
 The admin page admin.tsx hits an api/analytics endpoint for a database query and also fetches json data stored on the server for the bubble map. The server first authenticates the JWT token in the request header before running the database query. Data is returned for users who are verified subscribers. The analytics page has 4 charts:
 
