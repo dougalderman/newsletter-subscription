@@ -98,7 +98,7 @@ This is a React/Typerscript app with Axios/TanStack Query for http calls, Zod fo
 React, TypeScript, Lodash, Axios, TanStack Query, Observable Plot, D3, Zod/React Hook Form, React Router/Vite, Shadcn/UI,  Node.js, Express, JWT, MySQL.
 
 ## AI's used in development
-Cursor, Copilot, Google AI
+Cursor, Copilot, Gemini
 
 ## License
 This code is open source under the MIT license. See LICENSE in the project root folder.
