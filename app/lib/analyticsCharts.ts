@@ -45,7 +45,7 @@ export function buildSignupsAreaOptions(rows: UserRow[]): Plot.PlotOptions {
     width: 640,
     height: 320,
     marginLeft: 48,
-    x: { type: 'utc', label: 'Date' },
+    x: { type: 'utc'},
     y: { grid: true, label: 'Signups' },
     color: { scheme: 'blues'},
     marks: [
@@ -61,7 +61,7 @@ export function buildAmountAreaOptions(rows: UserRow[]): Plot.PlotOptions {
     width: 640,
     height: 320,
     marginLeft: 48,
-    x: { type: 'utc', label: 'Date' },
+    x: { type: 'utc' },
     y: { grid: true, label: 'Amount (USD)' },
     color: { scheme: 'greens'},
     marks: [
