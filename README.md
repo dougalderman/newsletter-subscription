@@ -6,8 +6,8 @@ A newsletter subscription form for U.S.-based subscribers, with different subscr
 http://167.71.24.179:5891
 
 User with admin credentials:
---Email: mary@mary.mary
---Password: 12345678
+Email: mary@mary.mary
+Password: 12345678
 
 ## Getting Started
 
