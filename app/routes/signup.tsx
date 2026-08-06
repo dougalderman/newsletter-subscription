@@ -126,6 +126,9 @@ export default function Signup() {
       <CardHeader className="text-center mb-8">
         <CardTitle className="text-2xl font-bold">Sign Up</CardTitle>
         <CardDescription>Please fill out this form to subscribe to our newsletter.</CardDescription>
+        <div className="text-red-500">
+          This is a demo site with no security. Do not enter any personal information!
+        </div>
       </CardHeader>
       <CardContent>
         <form id="signup-form" onSubmit={onSubmit} className="space-y-6">
