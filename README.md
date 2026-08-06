@@ -2,6 +2,13 @@
 
 A newsletter subscription form for U.S.-based subscribers, with different subscription levels and email verification, and an analytics page. It uses React v19, Node.js v24, and MySQL v8.
 
+## Demo Site
+http://167.71.24.179:5891
+
+User with admin credentials:
+--Email: mary@mary.mary
+--Password: 12345678
+
 ## Getting Started
 
 ### Prerequisites
